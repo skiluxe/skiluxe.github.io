@@ -1,0 +1,28 @@
+/* Room Popup Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+}
+body {
+    font-family: sans-serif;
+}
+
+h1 {
+    text-align: center;
+}
+
+.carousel {
+    display: flex; /* Enable flexbox for the carousel */
+    flex-wrap: wrap; /* Allow images to wrap to the next line if needed */
+    justify-content: center; /* Center images horizontally */
+    gap: 10px; /* Optional: Add gap between images */
+}
+
+.carousel img {
+    max-width: 30%; /* Adjust the percentage as needed */
+    height: auto;
+    display: block;
+}

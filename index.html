@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Hotel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="room-styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Welcome to Luxury Hotel</h1>
+
+        <section class="about">
+            <h2>About Us</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae diam id enim pellentesque ultrices. Sed at ligula sed odio tincidunt vulputate.</p>
+        </section>
+
+        <section class="rooms">
+            <h2>Our Rooms</h2>
+            <div class="room-gallery">
+                <div class="room" data-room="room1">
+                    <img src="assets/room1.jpg" alt="Deluxe Room">
+                    <h3>Deluxe Room</h3>
+                    <p>Spacious and elegant with a king-size bed.</p>
+                    <p class="availability"></p>
+                    <button class="book-now hidden">Book Now</button>
+                </div>
+                <div class="room" data-room="room2">
+                    <img src="assets/room2.jpeg" alt="Suite">
+                    <h3>Suite</h3>
+                    <p>Luxurious suite with separate living area.</p>
+                    <p class="availability"></p>
+                    <button class="book-now hidden">Book Now</button>
+                </div>
+                <div class="room" data-room="room3">
+                    <img src="assets/room3.jpg" alt="Family Room">
+                    <h3>Family Room</h3>
+                    <p>Comfortable room for families with two double beds.</p>
+                    <p class="availability"></p>
+                    <button class="book-now hidden">Book Now</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="booking">
+            <h2 class="booking-title">Book Your Stay</h2>
+            <div class="booking-container">
+                <form id="bookingForm">
+                    <label for="checkIn">Check-In Date:</label>
+                    <input type="date" id="checkIn" name="checkIn" required>
+
+                    <label for="checkOut">Check-Out Date:</label>
+                    <input type="date" id="checkOut" name="checkOut" required>
+
+                    <label for="guests">Number of Guests:</label>
+                    <select id="guests" name="guests">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                    </select>
+
+                    <div class="button-wrapper"> <button type="submit">Check Availability</button> </div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <div id="lightbox" class="hidden">
+        <div class="lightbox-content">
+            <span class="close-btn" onclick="closeLightbox()">&times;</span>
+            <div class="image-gallery"></div>
+            <div class="room-details"></div>
+        </div>
+    </div>
+
+    <div id="bookingFormPopup" class="hidden">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closeBookingPopup()">&times;</span>
+            <h2>Booking Details</h2>
+            <form id="bookingDetailsForm">
+                <input type="hidden" name="roomName">
+                <p id="room-price"></p>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <button type="submit">Confirm Booking</button> </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="script.js"></script>
+
+    <section class="contact">
+        <h2>Contact Us</h2>
+        <div class="contact-links">
+            <a href="https://api.whatsapp.com/send?phone=+995597718138" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Icon">
+                WhatsApp
+            </a>
+            <a href="https://www.instagram.com/gudauriflats/" target="_blank">
+                <img src="assets/instagram-icon.png" alt="Instagram Icon">
+            </a>
+        </div>
+    </section>
+
+</body>
+</html>
