@@ -24,5 +24,6 @@ h1 {
 .carousel img {
     max-width: 30%; /* Adjust the percentage as needed */
     height: auto;
+    border-radius: 15px;
     display: block;
 }

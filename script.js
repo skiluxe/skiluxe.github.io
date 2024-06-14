@@ -113,10 +113,11 @@ function openRoomWindow(roomName) {
                 }
     
                 .carousel img {
-                    max-width: 70%; /* Adjusted for better responsiveness */
+                    max-width: 60%; /* Adjusted for better responsiveness */
                     height: auto;
                     display: none; /* Hide all images initially */
                     margin: 10px auto;
+                    border-radius: 15px;
                 }
     
                 .carousel img.active {
