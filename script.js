@@ -34,7 +34,9 @@ const roomDescriptions = {
     room1: {
         title: "Apartment with Balcony",
         overview: "Our one-bedroom apartment is the perfect home base for your ski vacation. Located just steps from the gondola, you can easily access the slopes each day. The apartment has a fully equipped kitchen, comfortable living room, and a large bedroom with a queen-size bed. Relax on the private balcony with stunning mountain views. Book now and start planning your dream getaway!",
-        images: ["assets/room1.jpg", "assets/room1_2.jpg", "assets/room1_3.jpg"],
+        images: ["assets/room1.jpg", "assets/room1_2.jpg", "assets/room1_3.jpg", "assets/room1_4.jpg",
+            "assets/room1_5.jpg", "assets/room1_6.jpg", "assets/room1_7.jpg", "assets/room1_8.jpg", "assets/room1_9.jpg",
+            "assets/room1_10.jpg", "assets/room1_11.jpg", "assets/room1_12.jpg"],
         blockedDates: [
             { from: "2024-06-13", to: "2024-06-18" },
         ],
@@ -43,7 +45,8 @@ const roomDescriptions = {
     room2: {
         title: "Superior Studio",
         overview: "Our studio apartment is the perfect home base for your ski vacation. Located just steps from the gondola, you can easily access the slopes each day. The apartment has a fully equipped kitchenette, washing machine, comfortable living space, and a queen-size bed. Book now and start planning your dream getaway!",
-        images: ["assets/room2.jpeg", "assets/room2_2.jpeg", "assets/room2_3.jpeg"],
+        images: ["assets/room2.jpeg", "assets/room2_2.jpg", "assets/room2_3.jpg", "assets/room2_4.jpg",
+            "assets/room2_5.jpg", "assets/room2_6.jpg", "assets/room2_7.jpg", "assets/room2_8.jpg"],
         blockedDates: [
             { from: "2024-06-20", to: "2024-06-22" },
         ],
@@ -52,7 +55,8 @@ const roomDescriptions = {
     room3: {
         title: "Studio with Balcony",
         overview: "Cozy studio with balcony facing Gondola on the 5th floor in Loft 2 block.",
-        images: ["assets/room3.jpg", "assets/room3_2.jpg", "assets/room3_3.jpg"],
+        images: ["assets/room3.jpg", "assets/room3_2.jpg", "assets/room3_3.jpg", "assets/room3_4.jpg",
+            "assets/room3_5.jpg", "assets/room3_6.jpg", "assets/room3_7.jpg", "assets/room3_8.jpg"],
         blockedDates: [],
         pricePerNight: 80,
     },
@@ -108,6 +112,7 @@ function openRoomWindow(roomName) {
     
                 .carousel {
                     width: 100%;
+                    background-color: #333;
                     overflow: hidden;
                     position: relative; /* Ensure arrows are positioned relative to the carousel */
                 }
@@ -135,20 +140,14 @@ function openRoomWindow(roomName) {
                     z-index: 100;
                 }
     
-                .arrow.left {
-                    left: 0;
-                }
+                .arrow.left {left: 0;}
     
-                .arrow.right {
-                    right: 0;
-                }
+                .arrow.right {right: 0;}
+                
             </style>
         </head>
         <body>
             <h1>${room.title}</h1>
-            <p id="room-availability">
-                ${availabilityMessage} 
-            </p>
             <p>${room.overview}</p>
             <div class="carousel">
                 ${room.images.map((image, index) => `
@@ -341,8 +340,8 @@ function openBookingWindow(roomName) {
                 <input type="text" id="name" name="name" required>
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" required>
-<!--                <label for="phone">Phone:</label>-->
-<!--                <input type="phone" id="phone" name="phone" required>-->
+                <label for="phone">Phone:</label>
+                <input type="phone" id="phone" name="phone" required>
                 <button type="submit">Confirm Booking</button>
             </form>
             <p id="confirmationMessage" style="display: none; font-size: 18px; text-align: center;">Thank you for your booking! We will contact you shortly.</p>
