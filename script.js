@@ -32,8 +32,8 @@ flatpickr(checkOutInput, {
 // Room Descriptions and Blocked Dates (Example)
 const roomDescriptions = {
     room1: {
-        title: "Deluxe Room",
-        overview: "Spacious and elegant with a king-size bed.",
+        title: "Apartment with Balcony",
+        overview: "Our one-bedroom apartment is the perfect home base for your ski vacation. Located just steps from the gondola, you can easily access the slopes each day. The apartment has a fully equipped kitchen, comfortable living room, and a large bedroom with a queen-size bed. Relax on the private balcony with stunning mountain views. Book now and start planning your dream getaway!",
         images: ["assets/room1.jpg", "assets/room1_2.jpg", "assets/room1_3.jpg"],
         blockedDates: [
             { from: "2024-06-13", to: "2024-06-18" },
@@ -41,8 +41,8 @@ const roomDescriptions = {
         pricePerNight: 90,
     },
     room2: {
-        title: "Suite",
-        overview: "Luxurious suite with separate living area.",
+        title: "Superior Studio",
+        overview: "Our studio apartment is the perfect home base for your ski vacation. Located just steps from the gondola, you can easily access the slopes each day. The apartment has a fully equipped kitchenette, washing machine, comfortable living space, and a queen-size bed. Book now and start planning your dream getaway!",
         images: ["assets/room2.jpeg", "assets/room2_2.jpeg", "assets/room2_3.jpeg"],
         blockedDates: [
             { from: "2024-06-20", to: "2024-06-22" },
@@ -50,8 +50,8 @@ const roomDescriptions = {
         pricePerNight: 100,
     },
     room3: {
-        title: "Family Room",
-        overview: "Comfortable room for families with two double beds.",
+        title: "Studio with Balcony",
+        overview: "Cozy studio with balcony facing Gondola on the 5th floor in Loft 2 block.",
         images: ["assets/room3.jpg", "assets/room3_2.jpg", "assets/room3_3.jpg"],
         blockedDates: [],
         pricePerNight: 80,
