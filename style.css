@@ -5,6 +5,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    height: auto;
 }
 
 footer {
@@ -33,12 +34,15 @@ h1, h2 {
     display: flex;
     justify-content: space-around;
     gap: 20px; /* Adding gap between items */
+    align-items: center;
+    flex-direction: column;
+    overflow-y: auto;
 }
-
 
 
 .room {
     width: 30%;
+    height: 30%;
     text-align: center;
 }
 
