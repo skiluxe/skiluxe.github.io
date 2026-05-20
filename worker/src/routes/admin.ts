@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { Env, Booking } from "../types";
-import { clearSessionCookie, createSession, verifyPassword, verifySession } from "../lib/auth";
+import { clearSessionCookie, createSession, isPasswordHashFormat, verifyPassword, verifySession } from "../lib/auth";
 import { LoginInput, SeasonInput, PromotionInput, IcalSourceInput, DateOverrideInput } from "../lib/validate";
 import { audit } from "../lib/db";
 
@@ -26,9 +26,16 @@ adminRoutes.post("/login", async (c) => {
   const parsed = LoginInput.safeParse(body);
   if (!parsed.success) return c.json({ error: "invalid_input" }, 400);
   if (!c.env.ADMIN_PASSWORD_HASH) return c.json({ error: "not_configured" }, 503);
+  if (!isPasswordHashFormat(c.env.ADMIN_PASSWORD_HASH)) {
+    return c.json({ error: "hash_misconfigured" }, 503);
+  }
   const ok = await verifyPassword(parsed.data.password, c.env.ADMIN_PASSWORD_HASH);
   if (!ok) {
-    await audit(c.env.DB, "admin", "login.failed", null, null, { ip });
+    try {
+      await audit(c.env.DB, "admin", "login.failed", null, null, { ip });
+    } catch (e) {
+      console.error("audit login.failed:", e);
+    }
     return c.json({ error: "invalid_credentials" }, 401);
   }
   const { cookie } = await createSession(c.env);

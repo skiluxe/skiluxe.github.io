@@ -45,25 +45,45 @@ export async function hashPassword(password: string): Promise<string> {
   return `pbkdf2$${PBKDF2_ITER}$${bufToB64(salt.buffer)}$${bufToB64(bits)}`;
 }
 
-export async function verifyPassword(password: string, stored: string): Promise<boolean> {
-  const parts = stored.split("$");
+export function isPasswordHashFormat(stored: string): boolean {
+  const trimmed = stored.trim().replace(/^["']|["']$/g, "");
+  const parts = trimmed.split("$");
   if (parts.length !== 4 || parts[0] !== "pbkdf2") return false;
   const iter = parseInt(parts[1], 10);
-  const salt = b64ToBuf(parts[2]);
-  const expected = b64ToBuf(parts[3]);
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(password),
-    "PBKDF2",
-    false,
-    ["deriveBits"]
-  );
-  const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt, iterations: iter, hash: "SHA-256" },
-    key,
-    expected.length * 8
-  );
-  return bytesEq(new Uint8Array(bits), expected);
+  if (!Number.isFinite(iter) || iter < 1) return false;
+  try {
+    b64ToBuf(parts[2]);
+    b64ToBuf(parts[3]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  try {
+    if (!isPasswordHashFormat(stored)) return false;
+    const trimmed = stored.trim().replace(/^["']|["']$/g, "");
+    const parts = trimmed.split("$");
+    const iter = parseInt(parts[1], 10);
+    const salt = b64ToBuf(parts[2]);
+    const expected = b64ToBuf(parts[3]);
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(password),
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    );
+    const bits = await crypto.subtle.deriveBits(
+      { name: "PBKDF2", salt, iterations: iter, hash: "SHA-256" },
+      key,
+      expected.length * 8
+    );
+    return bytesEq(new Uint8Array(bits), expected);
+  } catch {
+    return false;
+  }
 }
 
 async function hmac(secret: string, message: string): Promise<string> {
@@ -90,7 +110,8 @@ export async function createSession(env: Env): Promise<{ token: string; cookie: 
   const sig = await hmac(env.SESSION_SECRET, payload);
   const token = `${payload}.${sig}`;
   await env.KV.put(`session:${id}`, JSON.stringify({ created_at: Date.now() }), { expirationTtl: SESSION_TTL });
-  const cookie = `sl_session=${token}; Path=/; Max-Age=${SESSION_TTL}; Secure; HttpOnly; SameSite=Lax`;
+  // SameSite=None: admin UI is on www.new-gudauri.com, API may be on workers.dev or api.new-gudauri.com
+  const cookie = `sl_session=${token}; Path=/; Max-Age=${SESSION_TTL}; Secure; HttpOnly; SameSite=None`;
   return { token, cookie };
 }
 
@@ -111,7 +132,7 @@ export async function verifySession(env: Env, cookieHeader: string | null): Prom
 }
 
 export function clearSessionCookie(): string {
-  return `sl_session=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax`;
+  return `sl_session=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=None`;
 }
 
 export async function signToken(env: Env, payload: string): Promise<string> {

@@ -138,7 +138,18 @@ async function renderLogin() {
       await api("/api/admin/login", { method: "POST", body: { password: pw } });
       location.hash = "#/";
     } catch (e) {
-      toast("Invalid password", "err");
+      const msg = String(e?.message || e);
+      if (msg.includes("429") || msg.includes("rate_limited")) {
+        toast("Too many attempts — wait an hour or ask to clear rate limit", "err");
+      } else if (msg.includes("hash_misconfigured")) {
+        toast("Password hash broken on server — run scripts/set-admin-password.sh", "err");
+      } else if (msg.includes("503") || msg.includes("not_configured")) {
+        toast("Admin password not configured on server", "err");
+      } else if (msg.includes("500") || msg.includes("internal_error")) {
+        toast("Server error — reset ADMIN_PASSWORD_HASH (see DEPLOYMENT.md)", "err");
+      } else {
+        toast("Invalid password", "err");
+      }
     }
   });
   app.appendChild(el("div", { class: "login" }, [
