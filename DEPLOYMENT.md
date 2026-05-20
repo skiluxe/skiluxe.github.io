@@ -62,7 +62,7 @@ Generate an admin password hash. From the repo root, run:
 
 ```bash
 node -e "
-const PBKDF2_ITER = 200000;
+const PBKDF2_ITER = 100000;  # Cloudflare Workers max; do not use 200000
 const crypto = require('crypto');
 const pw = process.argv[1];
 const salt = crypto.randomBytes(16);

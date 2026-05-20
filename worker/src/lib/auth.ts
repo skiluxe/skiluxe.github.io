@@ -2,15 +2,18 @@
 // Session cookies are HMAC-SHA256 signed; sessions are tracked in KV by token id.
 import type { Env } from "../types";
 
-const PBKDF2_ITER = 200_000;
+// Cloudflare Workers Web Crypto caps PBKDF2 at 100k iterations (not 200k like Node local dev).
+const PBKDF2_ITER = 100_000;
 const PBKDF2_KEYLEN = 32;
 const SESSION_TTL = 30 * 24 * 60 * 60; // 30 days seconds
 
-function bufToB64(buf: ArrayBuffer): string {
-  const bytes = new Uint8Array(buf);
+function bytesToB64(bytes: Uint8Array): string {
   let bin = "";
-  for (const b of bytes) bin += String.fromCharCode(b);
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
   return btoa(bin);
+}
+function bufToB64(buf: ArrayBuffer): string {
+  return bytesToB64(new Uint8Array(buf));
 }
 function b64ToBuf(b64: string): Uint8Array {
   const bin = atob(b64);
@@ -42,11 +45,22 @@ export async function hashPassword(password: string): Promise<string> {
     key,
     PBKDF2_KEYLEN * 8
   );
-  return `pbkdf2$${PBKDF2_ITER}$${bufToB64(salt.buffer)}$${bufToB64(bits)}`;
+  return `pbkdf2$${PBKDF2_ITER}$${bytesToB64(salt)}$${bytesToB64(new Uint8Array(bits))}`;
+}
+
+/** Secrets may be stored raw (pbkdf2$…) or base64-encoded to avoid $ corruption in shells/dashboards. */
+export function decodeStoredPasswordHash(stored: string): string {
+  const trimmed = stored.trim().replace(/^["']|["']$/g, "");
+  if (trimmed.startsWith("pbkdf2$")) return trimmed;
+  try {
+    return new TextDecoder().decode(b64ToBuf(trimmed));
+  } catch {
+    return trimmed;
+  }
 }
 
 export function isPasswordHashFormat(stored: string): boolean {
-  const trimmed = stored.trim().replace(/^["']|["']$/g, "");
+  const trimmed = decodeStoredPasswordHash(stored);
   const parts = trimmed.split("$");
   if (parts.length !== 4 || parts[0] !== "pbkdf2") return false;
   const iter = parseInt(parts[1], 10);
@@ -63,11 +77,12 @@ export function isPasswordHashFormat(stored: string): boolean {
 export async function verifyPassword(password: string, stored: string): Promise<boolean> {
   try {
     if (!isPasswordHashFormat(stored)) return false;
-    const trimmed = stored.trim().replace(/^["']|["']$/g, "");
+    const trimmed = decodeStoredPasswordHash(stored);
     const parts = trimmed.split("$");
     const iter = parseInt(parts[1], 10);
     const salt = b64ToBuf(parts[2]);
     const expected = b64ToBuf(parts[3]);
+    const saltBuf = salt.buffer.slice(salt.byteOffset, salt.byteOffset + salt.byteLength);
     const key = await crypto.subtle.importKey(
       "raw",
       new TextEncoder().encode(password),
@@ -76,7 +91,7 @@ export async function verifyPassword(password: string, stored: string): Promise<
       ["deriveBits"]
     );
     const bits = await crypto.subtle.deriveBits(
-      { name: "PBKDF2", salt, iterations: iter, hash: "SHA-256" },
+      { name: "PBKDF2", salt: saltBuf, iterations: iter, hash: "SHA-256" },
       key,
       expected.length * 8
     );

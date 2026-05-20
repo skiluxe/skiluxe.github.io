@@ -6,6 +6,7 @@ import { adminRoutes } from "./routes/admin";
 import { icalRoutes } from "./routes/ical";
 import { syncAllSources } from "./jobs/sync-ical";
 import { expireHolds } from "./jobs/expire-holds";
+import { isPasswordHashFormat } from "./lib/auth";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -26,6 +27,15 @@ app.use("*", async (c, next) => {
 
 app.get("/", (c) => c.json({ ok: true, service: "skiluxe-api" }));
 app.get("/health", (c) => c.json({ ok: true, ts: Date.now() }));
+app.get("/health/admin-auth", async (c) => {
+  const raw = c.env.ADMIN_PASSWORD_HASH ?? "";
+  return c.json({
+    configured: !!raw,
+    formatOk: raw ? isPasswordHashFormat(raw) : false,
+    storedLength: raw.length,
+    encoding: raw.startsWith("pbkdf2$") ? "raw" : "base64",
+  });
+});
 
 app.route("/api", publicRoutes);
 app.route("/api/admin", adminRoutes);

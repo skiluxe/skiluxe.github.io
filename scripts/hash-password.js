@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 // Generate a PBKDF2 password hash compatible with the worker's auth.ts.
 // Usage:  node scripts/hash-password.js <your-password>
-// Output: pbkdf2$200000$<saltB64>$<hashB64>
+// Output: pbkdf2$100000$<saltB64>$<hashB64>  (Cloudflare max = 100k iterations)
 
 const crypto = require("crypto");
 
-const PBKDF2_ITER = 200_000;
+const PBKDF2_ITER = 100_000;
 const PBKDF2_KEYLEN = 32;
 
 const pw = process.argv[2];

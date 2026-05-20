@@ -19,8 +19,7 @@ adminRoutes.post("/login", async (c) => {
   const ip = c.req.header("CF-Connecting-IP") || "unknown";
   const rlKey = `ratelimit:login:${ip}`;
   const count = parseInt((await c.env.KV.get(rlKey)) || "0", 10);
-  if (count >= 5) return c.json({ error: "rate_limited" }, 429);
-  await c.env.KV.put(rlKey, String(count + 1), { expirationTtl: 3600 });
+  if (count >= 20) return c.json({ error: "rate_limited" }, 429);
 
   const body = await c.req.json().catch(() => ({}));
   const parsed = LoginInput.safeParse(body);
@@ -31,6 +30,7 @@ adminRoutes.post("/login", async (c) => {
   }
   const ok = await verifyPassword(parsed.data.password, c.env.ADMIN_PASSWORD_HASH);
   if (!ok) {
+    await c.env.KV.put(rlKey, String(count + 1), { expirationTtl: 3600 });
     try {
       await audit(c.env.DB, "admin", "login.failed", null, null, { ip });
     } catch (e) {
