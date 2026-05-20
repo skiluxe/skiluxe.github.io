@@ -1,0 +1,250 @@
+/* ------- Apartment detail page ------- */
+
+.apartment { padding-block-end: var(--section-y); }
+
+.gallery {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr;
+}
+.gallery__hero {
+  position: relative;
+  aspect-ratio: 16 / 8;
+  overflow: hidden;
+  background: var(--navy-2);
+}
+.gallery__hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.gallery__hero--placeholder svg { width: 100%; height: 100%; object-fit: cover; }
+.gallery__thumbs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-inline: var(--gutter);
+  padding-block: 8px;
+  scrollbar-width: thin;
+}
+.gallery__thumb {
+  flex: 0 0 110px;
+  height: 70px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  overflow: hidden;
+  background: transparent;
+  padding: 0;
+  transition: border-color .2s ease, transform .15s ease;
+}
+.gallery__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.gallery__thumb.is-active { border-color: var(--bronze); }
+.gallery__thumb:hover { transform: translateY(-2px); }
+
+.apartment__top { padding-block: clamp(40px, 6vw, 72px) clamp(24px, 4vw, 48px); }
+.apartment__heading { max-width: 800px; }
+.apartment__heading .display { margin-block: 14px 16px; }
+.apartment__summary { color: var(--muted); font-size: 1.05rem; }
+.apartment__facts {
+  list-style: none;
+  padding: 0;
+  margin: 28px 0 0;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  border-block: 1px solid var(--line);
+  padding-block: 18px;
+}
+.apartment__facts li { font-family: var(--font-display); font-size: 1.1rem; color: var(--navy); }
+.apartment__facts li strong { font-weight: 500; }
+
+.apartment__layout {
+  display: grid;
+  gap: clamp(40px, 6vw, 72px);
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 1fr);
+  align-items: start;
+}
+.apartment__main { display: flex; flex-direction: column; gap: clamp(40px, 6vw, 72px); }
+
+.prose { max-width: 65ch; }
+.amenities {}
+.amenities__grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 18px 28px;
+}
+.amenities__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+.amenities__icon { width: 22px; height: 22px; color: var(--bronze); flex-shrink: 0; }
+
+/* ------- Availability calendar ------- */
+.availability__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.availability__legend { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.legend { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: middle; }
+.legend--available { background: var(--snow); border: 1px solid var(--line); }
+.legend--pending { background: rgba(168, 114, 72, 0.35); border: 1px solid var(--bronze); }
+.legend--blocked { background: var(--navy); }
+.availability__grid {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.cal {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  background: var(--snow);
+}
+.cal__title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 0 0 14px;
+  color: var(--navy);
+  text-transform: capitalize;
+}
+.cal__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal__dow { font-size: 0.7rem; text-align: center; color: var(--muted); padding: 4px 0; letter-spacing: 0.06em; }
+.cal__cell {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  color: var(--ink);
+  position: relative;
+}
+.cal__cell.is-empty { visibility: hidden; }
+.cal__cell.is-past { color: rgba(91, 107, 128, 0.4); }
+.cal__cell.is-pending { background: rgba(168, 114, 72, 0.18); color: var(--bronze-2); border: 1px solid rgba(168, 114, 72, 0.4); }
+.cal__cell.is-blocked { background: var(--navy); color: var(--snow); }
+
+/* ------- Booking widget ------- */
+.booking {
+  position: sticky;
+  top: 96px;
+  background: var(--snow);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-md);
+}
+.booking__head { padding-block-end: 16px; border-block-end: 1px solid var(--line); margin-block-end: 20px; }
+.booking__price { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.booking__from { color: var(--muted); font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.booking__amount { font-family: var(--font-display); font-size: 2rem; color: var(--navy); font-weight: 500; }
+.booking__per { color: var(--muted); font-size: 0.9rem; }
+.booking__subtitle { font-size: 0.78rem; color: var(--muted); margin-block: 14px 0; line-height: 1.5; }
+
+.booking__form { display: flex; flex-direction: column; gap: 16px; }
+.booking__form label { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: var(--muted); }
+.booking__form label > span { letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.72rem; font-weight: 600; }
+.booking__form input,
+.booking__form select,
+.booking__form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--snow);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.booking__form input:focus,
+.booking__form select:focus,
+.booking__form textarea:focus {
+  border-color: var(--bronze);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(168, 114, 72, 0.15);
+}
+.booking__row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.booking__guest { display: flex; flex-direction: column; gap: 12px; padding-block-start: 8px; }
+
+.booking__hint { font-size: 0.85rem; color: var(--muted); margin: 0; font-style: italic; }
+
+.booking__quote {
+  padding: 16px;
+  background: var(--snow-2);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.booking__quote-lines { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-direction: column; gap: 6px; }
+.booking__quote-lines li { display: flex; justify-content: space-between; gap: 12px; }
+.booking__quote-lines li.is-discount { color: var(--bronze); }
+.booking__quote-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-block-start: 12px;
+  border-block-start: 1px solid var(--line);
+  font-size: 1rem;
+}
+.booking__quote-total strong { font-family: var(--font-display); font-size: 1.5rem; color: var(--navy); }
+
+.booking__nr {
+  display: grid !important;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--snow);
+}
+.booking__nr:hover { border-color: var(--bronze); }
+.booking__nr input { width: 18px; height: 18px; padding: 0; margin-top: 2px; accent-color: var(--bronze); }
+.booking__nr-text { display: flex; flex-direction: column; gap: 4px; }
+.booking__nr-text strong { font-size: 0.92rem; color: var(--ink); text-transform: none; letter-spacing: 0; }
+.booking__nr-text small { color: var(--muted); font-size: 0.8rem; }
+
+.booking__submit { width: 100%; margin-block-start: 8px; }
+
+.booking__success {
+  padding: 18px;
+  background: rgba(168, 114, 72, 0.08);
+  border: 1px solid var(--bronze);
+  border-radius: 8px;
+  color: var(--navy);
+}
+.booking__success h3 { font-family: var(--font-display); margin: 0 0 6px; }
+.booking__success p { font-size: 0.9rem; margin: 0 0 12px; }
+
+.booking__error {
+  padding: 14px;
+  background: rgba(180, 60, 60, 0.08);
+  border: 1px solid #b43c3c;
+  border-radius: 8px;
+  color: #7d1b1b;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 1000px) {
+  .apartment__layout { grid-template-columns: 1fr; }
+  .booking { position: static; }
+}
+@media (max-width: 640px) {
+  .booking__row { grid-template-columns: 1fr; }
+  .gallery__hero { aspect-ratio: 4 / 3; }
+}

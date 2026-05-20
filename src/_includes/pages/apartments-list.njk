@@ -1,0 +1,45 @@
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">{{ i18n[lang].apartments.list_title }}</p>
+    <h1 class="display">{{ i18n[lang].apartments.list_subtitle }}</h1>
+  </div>
+</section>
+
+<section class="container section">
+  <ul class="apartment-grid apartment-grid--full">
+    {% for apt in apartments %}
+    <li class="apartment-card apartment-card--lg">
+      <a class="apartment-card__link" href="/{{ lang }}/apartments/{{ apt.slug }}/">
+        <div class="apartment-card__media">
+          {% set photos = apt.slug | photoList %}
+          {% if photos.length > 0 %}
+            <img src="{{ photos[0] }}" alt="" loading="lazy">
+          {% else %}
+            <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="card2-{{ apt.slug }}" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#1b3a5a"/><stop offset="1" stop-color="#0E223A"/>
+                </linearGradient>
+              </defs>
+              <rect width="800" height="500" fill="url(#card2-{{ apt.slug }})"/>
+              <polygon points="0,500 220,240 380,360 540,180 720,320 800,280 800,500" fill="#0E223A"/>
+              <polygon points="60,500 240,300 380,400 540,260 700,380 800,360 800,500" fill="#FAFAF7" opacity="0.08"/>
+            </svg>
+          {% endif %}
+        </div>
+        <div class="apartment-card__body">
+          <p class="apartment-card__complex">{{ apt.complex }} · {{ apt.ski_access }}</p>
+          <h2 class="apartment-card__title">{{ i18n[lang] | tpath(apt.label_key) }}</h2>
+          <p class="apartment-card__summary">{{ i18n[lang] | tpath(apt.summary_key) }}</p>
+          <p class="apartment-card__price">
+            <span>{{ i18n[lang].apartments.from }}</span>
+            <strong>{{ apt.base_rate_usd | currency("USD") }}</strong>
+            <span>{{ i18n[lang].apartments.per_night }}</span>
+          </p>
+          <span class="apartment-card__cta">{{ i18n[lang].apartments.view_details }} →</span>
+        </div>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>

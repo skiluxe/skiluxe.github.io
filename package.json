@@ -1,0 +1,14 @@
+{
+  "name": "skiluxe-new-gudauri",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SkiLuxe New Gudauri — boutique ski apartment rentals in Gudauri, Georgia.",
+  "scripts": {
+    "dev": "eleventy --serve --quiet",
+    "build": "eleventy",
+    "clean": "rm -rf _site .cache"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.0.0"
+  }
+}

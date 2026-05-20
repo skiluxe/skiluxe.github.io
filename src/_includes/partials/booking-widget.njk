@@ -1,0 +1,80 @@
+<aside class="booking" data-slug="{{ apartment.slug }}" data-max-guests="{{ apartment.max_guests }}" data-base="{{ apartment.base_rate_usd }}" data-currency="USD" data-lang="{{ lang }}">
+  <header class="booking__head">
+    <div class="booking__price">
+      <span class="booking__from">{{ i18n[lang].apartments.from }}</span>
+      <span class="booking__amount">{{ apartment.base_rate_usd | currency("USD") }}</span>
+      <span class="booking__per">{{ i18n[lang].apartments.per_night }}</span>
+    </div>
+  </header>
+
+  <form class="booking__form" novalidate>
+    <div class="booking__row">
+      <label>
+        <span>{{ i18n[lang].booking.checkin }}</span>
+        <input type="date" name="checkin" required>
+      </label>
+      <label>
+        <span>{{ i18n[lang].booking.checkout }}</span>
+        <input type="date" name="checkout" required>
+      </label>
+    </div>
+    <label class="booking__guests">
+      <span>{{ i18n[lang].booking.guests }}</span>
+      <select name="guests" required>
+        {% for n in range(1, apartment.max_guests + 1) %}
+          <option value="{{ n }}">{{ n }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <div class="booking__quote" hidden>
+      <ul class="booking__quote-lines"></ul>
+      <div class="booking__quote-total">
+        <span>{{ i18n[lang].booking.total }}</span>
+        <strong class="booking__quote-amount"></strong>
+      </div>
+    </div>
+    <p class="booking__hint">{{ i18n[lang].booking.select_dates }}</p>
+
+    <label class="booking__nr">
+      <input type="checkbox" name="non_refundable">
+      <span class="booking__nr-text">
+        <strong>{{ i18n[lang].booking.non_refundable_label }}</strong>
+        <small>{{ i18n[lang].booking.non_refundable_help }}</small>
+      </span>
+    </label>
+
+    <div class="booking__guest">
+      <label>
+        <span>{{ i18n[lang].booking.name }}</span>
+        <input type="text" name="name" autocomplete="name" required>
+      </label>
+      <label>
+        <span>{{ i18n[lang].booking.email }}</span>
+        <input type="email" name="email" autocomplete="email" required>
+      </label>
+      <label>
+        <span>{{ i18n[lang].booking.phone }}</span>
+        <input type="tel" name="phone" autocomplete="tel" required>
+      </label>
+      <label>
+        <span>{{ i18n[lang].booking.notes }}</span>
+        <textarea name="notes" rows="2"></textarea>
+      </label>
+    </div>
+
+    <button type="submit" class="btn btn--primary booking__submit">
+      <span class="booking__submit-idle">{{ i18n[lang].booking.submit }}</span>
+      <span class="booking__submit-busy" hidden>{{ i18n[lang].booking.submitting }}</span>
+    </button>
+
+    <p class="booking__subtitle">{{ i18n[lang].booking.subtitle }}</p>
+
+    <div class="booking__success" hidden>
+      <h3>{{ i18n[lang].booking.success_title }}</h3>
+      <p class="booking__success-text"></p>
+      <a class="btn btn--ghost" href="https://wa.me/{{ site.whatsapp | replace('+', '') }}">{{ i18n[lang].contact.whatsapp }}</a>
+    </div>
+    <div class="booking__error" role="alert" hidden></div>
+  </form>
+</aside>

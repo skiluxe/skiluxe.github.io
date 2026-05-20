@@ -1,0 +1,11 @@
+<section class="availability">
+  <header class="availability__head">
+    <h2 class="section-title">{{ i18n[lang].availability.title }}</h2>
+    <div class="availability__legend">
+      <span class="legend legend--available"></span><small>{{ i18n[lang].availability.available }}</small>
+      <span class="legend legend--pending"></span><small>{{ i18n[lang].availability.pending }}</small>
+      <span class="legend legend--blocked"></span><small>{{ i18n[lang].availability.blocked }}</small>
+    </div>
+  </header>
+  <div class="availability__grid" data-slug="{{ apartment.slug }}" data-months="3"></div>
+</section>

@@ -1,0 +1,10 @@
+---
+pagination:
+  data: apartments
+  size: 1
+  alias: apt
+permalink: "/ka/apartments/{{ apt.slug }}/"
+extraCss: "/assets/css/apartment.css"
+extraJs: "/assets/js/apartment.js"
+---
+{% include "pages/apartment-detail.njk" %}

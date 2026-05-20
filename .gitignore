@@ -1,0 +1,10 @@
+node_modules/
+_site/
+.cache/
+.DS_Store
+worker/.dev.vars
+worker/.wrangler/
+worker/node_modules/
+.env
+.env.local
+*.log

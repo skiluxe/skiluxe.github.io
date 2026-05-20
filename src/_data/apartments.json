@@ -1,0 +1,86 @@
+[
+  {
+    "slug": "f2-one-bedroom",
+    "complex": "Four Seasons F2",
+    "label_key": "apartments.f2_one_bedroom.label",
+    "summary_key": "apartments.f2_one_bedroom.summary",
+    "description_key": "apartments.f2_one_bedroom.description",
+    "bedrooms": 1,
+    "bathrooms": 1,
+    "max_guests": 4,
+    "area_sqm": 41,
+    "floor": 4,
+    "view": "mountain",
+    "ski_access": "ski-in/ski-out",
+    "base_rate_usd": 18000,
+    "amenities": [
+      "wifi", "kitchen", "balcony", "heating", "tv",
+      "washer", "ski_storage", "parking", "mountain_view",
+      "coffee_machine", "linens", "towels"
+    ],
+    "featured": true
+  },
+  {
+    "slug": "f2-superior-studio",
+    "complex": "Four Seasons F2",
+    "label_key": "apartments.f2_superior_studio.label",
+    "summary_key": "apartments.f2_superior_studio.summary",
+    "description_key": "apartments.f2_superior_studio.description",
+    "bedrooms": 0,
+    "bathrooms": 1,
+    "max_guests": 3,
+    "area_sqm": 32,
+    "floor": 3,
+    "view": "mountain",
+    "ski_access": "ski-in/ski-out",
+    "base_rate_usd": 14000,
+    "amenities": [
+      "wifi", "kitchen", "heating", "tv",
+      "ski_storage", "parking", "mountain_view",
+      "coffee_machine", "linens", "towels"
+    ],
+    "featured": true
+  },
+  {
+    "slug": "loft-2-alpine-deluxe",
+    "complex": "Loft 2",
+    "label_key": "apartments.loft_alpine_deluxe.label",
+    "summary_key": "apartments.loft_alpine_deluxe.summary",
+    "description_key": "apartments.loft_alpine_deluxe.description",
+    "bedrooms": 0,
+    "bathrooms": 1,
+    "max_guests": 5,
+    "area_sqm": 31,
+    "floor": 5,
+    "view": "mountain",
+    "ski_access": "100m to gondola",
+    "base_rate_usd": 15000,
+    "amenities": [
+      "wifi", "kitchen", "heating", "tv",
+      "washer", "ski_storage", "mountain_view",
+      "coffee_machine", "linens", "towels", "sofa_bed"
+    ],
+    "featured": true
+  },
+  {
+    "slug": "loft-2-studio-balcony",
+    "complex": "Loft 2",
+    "label_key": "apartments.loft_studio_balcony.label",
+    "summary_key": "apartments.loft_studio_balcony.summary",
+    "description_key": "apartments.loft_studio_balcony.description",
+    "bedrooms": 0,
+    "bathrooms": 1,
+    "max_guests": 3,
+    "area_sqm": 28,
+    "floor": 3,
+    "view": "valley",
+    "ski_access": "100m to gondola",
+    "base_rate_usd": 12000,
+    "amenities": [
+      "wifi", "kitchen", "balcony", "heating", "tv",
+      "ski_storage", "mountain_view",
+      "coffee_machine", "linens", "towels"
+    ],
+    "featured": false
+  }
+]

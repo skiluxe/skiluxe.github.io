@@ -1,0 +1,153 @@
+{
+  "lang": {
+    "name": "English",
+    "code": "en"
+  },
+  "meta": {
+    "title": "SkiLuxe New Gudauri — Boutique Ski Apartments",
+    "description": "Boutique ski-in / ski-out apartments at the heart of New Gudauri, Georgia. Editorial design, mountain views, ski enthusiasts welcome."
+  },
+  "nav": {
+    "home": "Home",
+    "apartments": "Apartments",
+    "about": "About",
+    "contact": "Contact",
+    "book": "Book"
+  },
+  "hero": {
+    "eyebrow": "Caucasus Mountains · 2200m",
+    "title": "Ski in. Ski out. Linger.",
+    "subtitle": "Four boutique apartments in the heart of New Gudauri — designed for skiers who want quiet luxury after a day on the piste.",
+    "cta_primary": "View apartments",
+    "cta_secondary": "Check availability"
+  },
+  "home": {
+    "intro_eyebrow": "The collection",
+    "intro_title": "Four apartments. Two of Gudauri's best buildings.",
+    "intro_text": "Hand-picked units in Four Seasons F2 and Loft 2 — both walk-on to the gondola, both finished for travellers who notice the difference between thrown together and thoughtfully done.",
+    "feature_1_title": "On the piste",
+    "feature_1_text": "Step out, click in. Both buildings sit on the New Gudauri slope cluster — no shuttles, no taxis, no excuses to sleep in.",
+    "feature_2_title": "Designed for skiers",
+    "feature_2_text": "Heated boot rooms, ski storage, drying racks, deep tubs. Built around the rhythm of a real ski day.",
+    "feature_3_title": "Quiet luxury",
+    "feature_3_text": "Linen sheets, espresso machines, mountain-facing balconies. Less marketing, more substance.",
+    "season_eyebrow": "Seasons",
+    "season_title": "Powder December through April",
+    "season_text": "Gudauri opens mid-December and runs through April. We hold high-season rates from the holiday week through Orthodox Christmas, with mid-season either side. Off-season summer stays welcome multi-week guests at a discount.",
+    "view_all": "Explore all apartments"
+  },
+  "apartments": {
+    "list_title": "The apartments",
+    "list_subtitle": "Four units across two buildings. Pick the one that fits your trip.",
+    "guests": "Up to {count} guests",
+    "guests_one": "1 guest",
+    "area": "{m}m²",
+    "bedrooms_zero": "Studio",
+    "bedrooms_one": "1 bedroom",
+    "bedrooms_n": "{n} bedrooms",
+    "from": "From",
+    "per_night": "/ night",
+    "view_details": "View details",
+    "f2_one_bedroom": {
+      "label": "One-Bedroom Apartment with Balcony",
+      "summary": "Four Seasons F2 · One bedroom · 41m² · sleeps 4",
+      "description": "Our largest unit. A separate bedroom with a king-size bed, a living room that opens onto a balcony with mountain views, and a fully kitted kitchen for long lazy mornings. The pick for couples-plus-two or a family of four who don't want to be on top of each other."
+    },
+    "f2_superior_studio": {
+      "label": "Superior Studio",
+      "summary": "Four Seasons F2 · Studio · 32m² · sleeps 3",
+      "description": "An open-plan studio in our flagship building — clean lines, soft light, mountain-facing windows. A queen bed, a pull-out for a third guest, and direct gondola access downstairs."
+    },
+    "loft_alpine_deluxe": {
+      "label": "Alpine Deluxe Studio",
+      "summary": "Loft 2 · Studio · 31m² · sleeps 5",
+      "description": "The most flexible unit in the collection: a deluxe studio with a clever sleeping configuration that handles up to five — perfect for a group of friends splitting the cost. Walk-on to the slopes in under two minutes."
+    },
+    "loft_studio_balcony": {
+      "label": "Studio with Balcony",
+      "summary": "Loft 2 · Studio · 28m² · sleeps 3",
+      "description": "A cozy studio with a private balcony looking out over the valley. Right-sized for a pair or a trio of friends, and priced to leave room for an extra night."
+    }
+  },
+  "amenities": {
+    "title": "Amenities"
+  },
+  "amenity": {
+    "wifi": "Fast Wi-Fi",
+    "kitchen": "Full kitchen",
+    "balcony": "Private balcony",
+    "heating": "Central heating",
+    "tv": "Smart TV",
+    "washer": "Washing machine",
+    "ski_storage": "Heated ski storage",
+    "parking": "Parking",
+    "mountain_view": "Mountain view",
+    "coffee_machine": "Espresso machine",
+    "linens": "Linen bedding",
+    "towels": "Plush towels",
+    "sofa_bed": "Sofa bed"
+  },
+  "booking": {
+    "title": "Reserve your stay",
+    "subtitle": "Hold the dates online. Pay directly with the owner — bank transfer, card, or cash.",
+    "checkin": "Check in",
+    "checkout": "Check out",
+    "guests": "Guests",
+    "nights": "{n} nights",
+    "nights_one": "1 night",
+    "subtotal": "Subtotal",
+    "weekly_discount": "Weekly stay discount",
+    "non_refundable_discount": "Non-refundable discount",
+    "total": "Total",
+    "non_refundable_label": "Non-refundable rate (save more)",
+    "non_refundable_help": "Reduced price in exchange for no refunds after booking.",
+    "name": "Full name",
+    "email": "Email",
+    "phone": "Phone (with country code)",
+    "notes": "Notes (optional)",
+    "submit": "Hold these dates for 24h",
+    "submitting": "Holding…",
+    "success_title": "Dates held",
+    "success_text": "We've put a 24h hold on these dates and notified the owner. You'll hear back shortly to confirm payment details. Booking reference: {ref}.",
+    "error_generic": "Something went wrong. Please try again or message us on WhatsApp.",
+    "error_unavailable": "Sorry — those dates are no longer available. Please pick different dates.",
+    "select_dates": "Select dates to see the price",
+    "min_stay": "Minimum 2 nights.",
+    "max_guests": "Maximum {n} guests for this apartment."
+  },
+  "availability": {
+    "title": "Availability",
+    "available": "Available",
+    "blocked": "Booked",
+    "pending": "On hold"
+  },
+  "about": {
+    "title": "About SkiLuxe",
+    "subtitle": "A small collection. A high bar.",
+    "p1": "SkiLuxe is a family-run set of four apartments in New Gudauri. We grew up on these slopes and we know what a ski trip needs to feel like — and what it shouldn't feel like.",
+    "p2": "Every unit is owned and managed by us. No call centres. No vague check-in window. If something needs fixing, one of us is in town to fix it. If you want a restaurant recommendation, you're getting one from the person who eats there.",
+    "p3": "We host skiers, snowboarders, ski-tourers, and the occasional summer mountain runner. We don't host stag weekends.",
+    "where_title": "Where we are",
+    "where_text": "New Gudauri sits at 2,200m in the Caucasus, on the Georgian Military Road two hours north of Tbilisi. The resort tops out above 3,300m with 70+ km of marked runs and some of the most accessible off-piste in Europe."
+  },
+  "contact": {
+    "title": "Get in touch",
+    "subtitle": "Fastest reply on WhatsApp. We answer in English, Russian, Georgian, and Hebrew.",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "instagram": "Instagram",
+    "directions_title": "Getting here",
+    "directions_text": "From Tbilisi international airport, a private transfer takes 2h. We can arrange one — message us in advance.",
+    "checkin_title": "Check-in",
+    "checkin_text": "Self check-in with a code. We'll send full directions the day before your arrival."
+  },
+  "footer": {
+    "links": "Site",
+    "contact": "Contact",
+    "legal": "© {year} SkiLuxe New Gudauri. All rights reserved.",
+    "built": "Crafted in the mountains."
+  },
+  "lang_switcher": {
+    "label": "Language"
+  }
+}

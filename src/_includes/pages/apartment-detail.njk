@@ -1,0 +1,32 @@
+{% set apartment = apt %}
+<article class="apartment">
+  {% include "partials/photo-gallery.njk" %}
+
+  <div class="apartment__top container">
+    <div class="apartment__heading">
+      <p class="eyebrow">{{ apartment.complex }} · {{ apartment.ski_access }}</p>
+      <h1 class="display">{{ i18n[lang] | tpath(apartment.label_key) }}</h1>
+      <p class="apartment__summary">{{ i18n[lang] | tpath(apartment.summary_key) }}</p>
+      <ul class="apartment__facts">
+        <li><strong>{% if apartment.bedrooms == 0 %}{{ i18n[lang].apartments.bedrooms_zero }}{% elif apartment.bedrooms == 1 %}{{ i18n[lang].apartments.bedrooms_one }}{% else %}{% tx "apartments.bedrooms_n", { n: apartment.bedrooms } %}{% endif %}</strong></li>
+        <li><strong>{% tx "apartments.area", { m: apartment.area_sqm } %}</strong></li>
+        <li><strong>{% if apartment.max_guests == 1 %}{{ i18n[lang].apartments.guests_one }}{% else %}{% tx "apartments.guests", { count: apartment.max_guests } %}{% endif %}</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="apartment__layout container">
+    <div class="apartment__main">
+      <section class="prose">
+        <p>{{ i18n[lang] | tpath(apartment.description_key) }}</p>
+      </section>
+
+      {% include "partials/amenities-grid.njk" %}
+      {% include "partials/calendar.njk" %}
+    </div>
+
+    <div class="apartment__side">
+      {% include "partials/booking-widget.njk" %}
+    </div>
+  </div>
+</article>

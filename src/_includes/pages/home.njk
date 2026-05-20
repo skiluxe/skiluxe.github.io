@@ -1,0 +1,144 @@
+<section class="hero">
+  <div class="hero__media" aria-hidden="true">
+    <svg class="hero__bg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0E223A"/>
+          <stop offset="0.5" stop-color="#2A4868"/>
+          <stop offset="1" stop-color="#A87248" stop-opacity="0.4"/>
+        </linearGradient>
+        <linearGradient id="far" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1b3552"/>
+          <stop offset="1" stop-color="#0E223A"/>
+        </linearGradient>
+        <linearGradient id="near" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0c1c30"/>
+          <stop offset="1" stop-color="#06101c"/>
+        </linearGradient>
+      </defs>
+      <rect width="1600" height="900" fill="url(#sky)"/>
+      <g opacity="0.6">
+        <circle cx="1280" cy="180" r="3" fill="#FAFAF7"/>
+        <circle cx="1410" cy="120" r="2" fill="#FAFAF7"/>
+        <circle cx="1100" cy="230" r="1.5" fill="#FAFAF7"/>
+        <circle cx="950" cy="160" r="2" fill="#FAFAF7"/>
+        <circle cx="1500" cy="260" r="1.5" fill="#FAFAF7"/>
+      </g>
+      <polygon points="0,900 0,580 220,420 360,500 540,360 720,470 900,360 1080,500 1280,400 1450,520 1600,460 1600,900" fill="url(#far)"/>
+      <polygon points="0,900 0,680 180,580 320,640 480,540 660,620 820,560 980,640 1180,560 1340,640 1600,580 1600,900" fill="url(#near)"/>
+      <g opacity="0.6">
+        <polygon points="220,420 270,440 320,430 360,500 200,510" fill="#FAFAF7" opacity="0.18"/>
+        <polygon points="540,360 590,380 640,365 720,470 560,470" fill="#FAFAF7" opacity="0.18"/>
+        <polygon points="900,360 950,380 1000,370 1080,500 880,490" fill="#FAFAF7" opacity="0.18"/>
+        <polygon points="1280,400 1330,420 1380,410 1450,520 1260,510" fill="#FAFAF7" opacity="0.18"/>
+      </g>
+    </svg>
+  </div>
+  <div class="container hero__content">
+    <p class="eyebrow">{{ i18n[lang].hero.eyebrow }}</p>
+    <h1 class="hero__title">{{ i18n[lang].hero.title }}</h1>
+    <p class="hero__subtitle">{{ i18n[lang].hero.subtitle }}</p>
+    <div class="hero__cta">
+      <a class="btn btn--primary" href="/{{ lang }}/apartments/">{{ i18n[lang].hero.cta_primary }}</a>
+      <a class="btn btn--ghost-light" href="/{{ lang }}/apartments/">{{ i18n[lang].hero.cta_secondary }}</a>
+    </div>
+  </div>
+  <div class="hero__scroll" aria-hidden="true">
+    <span></span>
+  </div>
+</section>
+
+<section class="intro container section">
+  <div class="intro__head">
+    <p class="eyebrow">{{ i18n[lang].home.intro_eyebrow }}</p>
+    <h2 class="display">{{ i18n[lang].home.intro_title }}</h2>
+    <p class="lead">{{ i18n[lang].home.intro_text }}</p>
+  </div>
+
+  <ul class="features">
+    <li class="feature">
+      <div class="feature__icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M4 26 L13 12 L17 18 L22 10 L28 26 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 21 L23 21" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </div>
+      <h3>{{ i18n[lang].home.feature_1_title }}</h3>
+      <p>{{ i18n[lang].home.feature_1_text }}</p>
+    </li>
+    <li class="feature">
+      <div class="feature__icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M8 28 L14 4 M16 4 L22 28 M9 25 H23" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <h3>{{ i18n[lang].home.feature_2_title }}</h3>
+      <p>{{ i18n[lang].home.feature_2_text }}</p>
+    </li>
+    <li class="feature">
+      <div class="feature__icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M6 24 V12 a4 4 0 0 1 4 -4 H22 a4 4 0 0 1 4 4 V24 M6 24 H26 M10 8 V6 M22 8 V6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </div>
+      <h3>{{ i18n[lang].home.feature_3_title }}</h3>
+      <p>{{ i18n[lang].home.feature_3_text }}</p>
+    </li>
+  </ul>
+</section>
+
+<section class="featured section--alt">
+  <div class="container">
+    <header class="section-header">
+      <p class="eyebrow">{{ i18n[lang].apartments.list_title }}</p>
+      <h2 class="display">{{ i18n[lang].apartments.list_subtitle }}</h2>
+    </header>
+
+    <ul class="apartment-grid">
+      {% for apt in apartments %}
+      <li class="apartment-card">
+        <a class="apartment-card__link" href="/{{ lang }}/apartments/{{ apt.slug }}/">
+          <div class="apartment-card__media">
+            {% set photos = apt.slug | photoList %}
+            {% if photos.length > 0 %}
+              <img src="{{ photos[0] }}" alt="" loading="lazy">
+            {% else %}
+              <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="card-{{ apt.slug }}" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#1b3a5a"/><stop offset="1" stop-color="#0E223A"/>
+                  </linearGradient>
+                </defs>
+                <rect width="800" height="500" fill="url(#card-{{ apt.slug }})"/>
+                <polygon points="0,500 220,260 380,380 540,200 720,340 800,300 800,500" fill="#0E223A"/>
+                <polygon points="60,500 240,320 380,420 540,280 700,400 800,380 800,500" fill="#FAFAF7" opacity="0.08"/>
+              </svg>
+            {% endif %}
+          </div>
+          <div class="apartment-card__body">
+            <p class="apartment-card__complex">{{ apt.complex }}</p>
+            <h3 class="apartment-card__title">{{ i18n[lang] | tpath(apt.label_key) }}</h3>
+            <p class="apartment-card__meta">
+              <span>{% if apt.bedrooms == 0 %}{{ i18n[lang].apartments.bedrooms_zero }}{% elif apt.bedrooms == 1 %}{{ i18n[lang].apartments.bedrooms_one }}{% else %}{% tx "apartments.bedrooms_n", { n: apt.bedrooms } %}{% endif %}</span>
+              <span>·</span>
+              <span>{% tx "apartments.area", { m: apt.area_sqm } %}</span>
+              <span>·</span>
+              <span>{% if apt.max_guests == 1 %}{{ i18n[lang].apartments.guests_one }}{% else %}{% tx "apartments.guests", { count: apt.max_guests } %}{% endif %}</span>
+            </p>
+            <p class="apartment-card__price">
+              <span>{{ i18n[lang].apartments.from }}</span>
+              <strong>{{ apt.base_rate_usd | currency("USD") }}</strong>
+              <span>{{ i18n[lang].apartments.per_night }}</span>
+            </p>
+          </div>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="section-cta">
+      <a class="btn btn--primary" href="/{{ lang }}/apartments/">{{ i18n[lang].home.view_all }}</a>
+    </div>
+  </div>
+</section>
+
+<section class="season container section">
+  <div class="season__inner">
+    <p class="eyebrow">{{ i18n[lang].home.season_eyebrow }}</p>
+    <h2 class="display">{{ i18n[lang].home.season_title }}</h2>
+    <p class="lead">{{ i18n[lang].home.season_text }}</p>
+  </div>
+</section>

@@ -1,0 +1,42 @@
+---
+permalink: "/index.html"
+eleventyExcludeFromCollections: true
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SkiLuxe New Gudauri</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="0;url=/en/">
+  <link rel="canonical" href="https://new-gudauri.com/en/">
+  <script>
+    (function () {
+      var supported = ["en", "ru", "ka", "he"];
+      var saved = null;
+      try { saved = localStorage.getItem("skiluxe.lang"); } catch (e) {}
+      var pick = saved && supported.indexOf(saved) >= 0 ? saved : null;
+      if (!pick) {
+        var lang = (navigator.language || "en").toLowerCase();
+        for (var i = 0; i < supported.length; i++) {
+          if (lang === supported[i] || lang.indexOf(supported[i] + "-") === 0) {
+            pick = supported[i];
+            break;
+          }
+        }
+        if (!pick && lang.indexOf("iw") === 0) pick = "he";
+      }
+      pick = pick || "en";
+      location.replace("/" + pick + "/");
+    })();
+  </script>
+</head>
+<body>
+  <p style="font-family:system-ui,sans-serif;text-align:center;padding:48px">
+    <a href="/en/">English</a> ·
+    <a href="/ru/">Русский</a> ·
+    <a href="/ka/">ქართული</a> ·
+    <a href="/he/">עברית</a>
+  </p>
+</body>
+</html>

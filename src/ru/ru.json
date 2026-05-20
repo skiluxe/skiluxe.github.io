@@ -1,0 +1,6 @@
+{
+  "lang": "ru",
+  "dir": "ltr",
+  "layout": "layouts/base.njk",
+  "tags": ["page"]
+}

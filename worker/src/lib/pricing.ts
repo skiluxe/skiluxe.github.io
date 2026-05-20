@@ -1,0 +1,102 @@
+import type { Apartment, DateOverride, Promotion, QuoteResult, Season } from "../types";
+
+function parseDate(s: string): Date {
+  return new Date(s + "T00:00:00Z");
+}
+function ymd(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+function eachDate(start: string, end: string): string[] {
+  const out: string[] = [];
+  const s = parseDate(start);
+  const e = parseDate(end);
+  for (let t = s.getTime(); t < e.getTime(); t += 86400000) out.push(ymd(new Date(t)));
+  return out;
+}
+function nightsBetween(start: string, end: string): number {
+  return Math.round((parseDate(end).getTime() - parseDate(start).getTime()) / 86400000);
+}
+
+function findSeason(seasons: Season[], date: string): Season | null {
+  let best: Season | null = null;
+  for (const s of seasons) {
+    if (date >= s.start_date && date <= s.end_date) {
+      if (!best || s.priority > best.priority) best = s;
+    }
+  }
+  return best;
+}
+
+export function quote(
+  apartment: Apartment,
+  seasons: Season[],
+  overridesByDate: Map<string, DateOverride>,
+  promos: Promotion[],
+  checkin: string,
+  checkout: string,
+  flags: { non_refundable?: boolean } = {}
+): QuoteResult {
+  const dates = eachDate(checkin, checkout);
+  const nights: { date: string; rate: number }[] = [];
+  for (const d of dates) {
+    const override = overridesByDate.get(d);
+    let rate = apartment.base_rate;
+    if (override) {
+      rate = override.rate;
+    } else {
+      const season = findSeason(seasons, d);
+      if (season) {
+        rate = season.override_rate != null ? season.override_rate : Math.round(apartment.base_rate * season.multiplier);
+      }
+    }
+    nights.push({ date: d, rate });
+  }
+
+  const subtotal = nights.reduce((acc, n) => acc + n.rate, 0);
+  const totalNights = nights.length;
+
+  const discounts: QuoteResult["discounts"] = [];
+
+  const weekly = promos.find((p) => p.kind === "weekly" && p.active);
+  if (weekly) {
+    const params = parseJson(weekly.params_json);
+    const minNights = params.min_nights || 7;
+    const percent = params.percent || 10;
+    if (totalNights >= minNights) {
+      const amount = Math.round((subtotal * percent) / 100);
+      discounts.push({ kind: "weekly", label: "Weekly stay", amount, percent });
+    }
+  }
+
+  const nr = promos.find((p) => p.kind === "non_refundable" && p.active);
+  if (nr && flags.non_refundable) {
+    const params = parseJson(nr.params_json);
+    const percent = params.percent || 15;
+    const alreadyApplied = discounts.reduce((a, d) => a + d.amount, 0);
+    const base = nr.stackable ? subtotal - alreadyApplied : subtotal;
+    const amount = Math.round((base * percent) / 100);
+    discounts.push({ kind: "non_refundable", label: "Non-refundable", amount, percent });
+  }
+
+  const total = subtotal - discounts.reduce((acc, d) => acc + d.amount, 0);
+
+  return {
+    nights,
+    subtotal,
+    discounts,
+    total,
+    currency: apartment.currency,
+    apartment_slug: apartment.slug,
+    computed_at: Date.now(),
+  };
+}
+
+function parseJson(s: string): { [k: string]: any } {
+  try {
+    return JSON.parse(s || "{}");
+  } catch {
+    return {};
+  }
+}
+
+export { nightsBetween, eachDate, ymd };

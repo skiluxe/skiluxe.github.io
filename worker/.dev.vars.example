@@ -1,0 +1,12 @@
+# Copy to .dev.vars for local development.
+# In production set these with: wrangler secret put <NAME>
+
+ADMIN_PASSWORD_HASH = "pbkdf2$200000$put-salt-base64-here$put-hash-base64-here"
+SESSION_SECRET = "dev-secret-change-me-32-bytes-hex"
+OWNER_EMAIL = "stay@example.com"
+OWNER_WHATSAPP_PHONE = "+995000000000"
+CALLMEBOT_API_KEY = ""
+MAIL_FROM = "noreply@new-gudauri.com"
+MAIL_DKIM_DOMAIN = ""
+MAIL_DKIM_SELECTOR = ""
+MAIL_DKIM_PRIVATE_KEY = ""

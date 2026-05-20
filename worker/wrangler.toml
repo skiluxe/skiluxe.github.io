@@ -1,0 +1,37 @@
+name = "skiluxe-api"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Custom domain set via Cloudflare dashboard: api.new-gudauri.com
+# routes = [{ pattern = "api.new-gudauri.com/*", custom_domain = true }]
+
+[vars]
+SITE_ORIGIN = "https://new-gudauri.com"
+ALT_SITE_ORIGIN = "https://www.new-gudauri.com"
+HOLD_HOURS = "24"
+ICAL_OWNER_EMAIL = "stay@new-gudauri.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "skiluxe-db"
+database_id = "REPLACE_WITH_D1_ID"
+migrations_dir = "migrations"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_KV_ID"
+
+[triggers]
+crons = ["*/15 * * * *", "*/5 * * * *"]
+
+# Secrets (set via `wrangler secret put`):
+# ADMIN_PASSWORD_HASH   pbkdf2$iterations$saltBase64$hashBase64
+# SESSION_SECRET        32 random bytes (hex or base64)
+# OWNER_EMAIL           e.g. stay@new-gudauri.com
+# OWNER_WHATSAPP_PHONE  e.g. +9725...
+# CALLMEBOT_API_KEY     CallMeBot WhatsApp key
+# MAIL_FROM             noreply@new-gudauri.com
+# MAIL_DKIM_DOMAIN      new-gudauri.com
+# MAIL_DKIM_SELECTOR    mailchannels
+# MAIL_DKIM_PRIVATE_KEY base64 of DKIM private key (PKCS8)

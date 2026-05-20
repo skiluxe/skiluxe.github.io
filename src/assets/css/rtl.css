@@ -1,0 +1,34 @@
+/* Hebrew RTL overrides. main.css uses logical properties so most things flip automatically.
+   These only handle the things logical properties can't reach. */
+
+.lang-he .hero__title,
+.lang-he .display,
+.lang-he h1, .lang-he h2, .lang-he h3, .lang-he h4 {
+  letter-spacing: 0;
+}
+
+.lang-he .site-brand__tag,
+.lang-he .eyebrow {
+  letter-spacing: 0.06em;
+}
+
+.lang-he .booking__quote-lines li,
+.lang-he .booking__quote-total {
+  direction: rtl;
+}
+
+/* Latin numerals and money symbols should still read LTR inside RTL text */
+.lang-he .booking__amount,
+.lang-he .apartment-card__price strong,
+.lang-he .booking__quote-total strong {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.lang-he .hero__scroll span::after {
+  /* keep animation symmetric */
+}
+
+.lang-he .site-nav a::after {
+  transform-origin: center;
+}

@@ -1,0 +1,13 @@
+<div class="lang-switcher" data-current="{{ lang }}">
+  <button class="lang-switcher__btn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="{{ i18n[lang].lang_switcher.label }}">
+    <span aria-hidden="true">{% for l in site.langs %}{% if l.code == lang %}{{ l.label }}{% endif %}{% endfor %}</span>
+    <svg viewBox="0 0 12 8" width="10" height="6" aria-hidden="true"><path d="M1 1 L6 6 L11 1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <ul class="lang-switcher__menu" role="listbox" hidden>
+    {% for l in site.langs %}
+    <li role="option" aria-selected="{{ 'true' if l.code == lang else 'false' }}">
+      <a href="/{{ l.code }}{{ page.url | replace('/' + lang + '/', '/') }}" lang="{{ l.code }}" dir="{{ l.dir }}">{{ l.label }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>

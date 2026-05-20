@@ -1,0 +1,23 @@
+{
+  "name": "skiluxe-worker",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev --local --persist-to .wrangler/state",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "db:apply:local": "wrangler d1 migrations apply skiluxe-db --local && wrangler d1 execute skiluxe-db --local --file=migrations/0002_seed_apartments.sql && wrangler d1 execute skiluxe-db --local --file=migrations/0003_seed_seasons.sql",
+    "db:apply:remote": "wrangler d1 migrations apply skiluxe-db --remote",
+    "db:seed:remote": "wrangler d1 execute skiluxe-db --remote --file=migrations/0002_seed_apartments.sql && wrangler d1 execute skiluxe-db --remote --file=migrations/0003_seed_seasons.sql"
+  },
+  "dependencies": {
+    "hono": "^4.6.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240909.0",
+    "typescript": "^5.5.0",
+    "wrangler": "^3.78.0"
+  }
+}

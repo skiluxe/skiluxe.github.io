@@ -1,0 +1,6 @@
+{
+  "lang": "he",
+  "dir": "rtl",
+  "layout": "layouts/base.njk",
+  "tags": ["page"]
+}

@@ -1,0 +1,33 @@
+{% set photos = apartment.slug | photoList %}
+<section class="gallery" data-slug="{{ apartment.slug }}">
+  {% if photos.length > 0 %}
+    <div class="gallery__hero">
+      <img src="{{ photos[0] }}" alt="{{ i18n[lang][apartment.label_key.split('.')[1]][apartment.label_key.split('.')[2]] }}" loading="eager">
+    </div>
+    {% if photos.length > 1 %}
+    <div class="gallery__thumbs">
+      {% for p in photos %}
+        <button class="gallery__thumb{% if loop.first %} is-active{% endif %}" data-src="{{ p }}" aria-label="Photo {{ loop.index }}">
+          <img src="{{ p }}" alt="" loading="lazy">
+        </button>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% else %}
+    <div class="gallery__hero gallery__hero--placeholder" aria-label="Photo placeholder">
+      <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="sky-{{ apartment.slug }}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1b3a5a"/>
+            <stop offset="1" stop-color="#3e6889"/>
+          </linearGradient>
+        </defs>
+        <rect width="800" height="500" fill="url(#sky-{{ apartment.slug }})"/>
+        <polygon points="0,500 180,200 320,360 460,140 620,300 800,180 800,500" fill="#0E223A" opacity="0.85"/>
+        <polygon points="0,500 240,260 420,400 560,220 720,380 800,310 800,500" fill="#0E223A"/>
+        <polygon points="80,500 220,300 360,420 500,260 660,400 800,360 800,500" fill="#FAFAF7" opacity="0.08"/>
+        <text x="400" y="470" text-anchor="middle" font-family="serif" font-size="22" fill="#FAFAF7" opacity="0.6">{{ apartment.complex }}</text>
+      </svg>
+    </div>
+  {% endif %}
+</section>
