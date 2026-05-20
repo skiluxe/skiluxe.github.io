@@ -3,7 +3,7 @@ module.exports = {
   brandShort: "SkiLuxe",
   tagline: "Boutique ski apartments in the Caucasus",
   domain: "new-gudauri.com",
-  apiBase: process.env.API_BASE || "https://api.new-gudauri.com",
+  apiBase: "https://skiluxe-api.gudauri-skiluxe-api.workers.dev",
   email: "stay@new-gudauri.com",
   whatsapp: "+995595967500",
   whatsappDisplay: "+995 595 967 500",
