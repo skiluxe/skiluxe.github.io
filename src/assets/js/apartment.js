@@ -123,28 +123,50 @@ function isRangeUnavailable(checkin, checkout, statusByDate) {
   return false;
 }
 
-function calendarViewEnd(months) {
-  const today = new Date();
-  return new Date(today.getFullYear(), today.getMonth() + months, 0);
+// Ski season grid: November–April (6 months, 3×2 layout).
+const SKI_SEASON_MONTHS = [10, 11, 0, 1, 2, 3]; // Nov–Apr
+
+function getSkiSeasonStartYear(today = new Date()) {
+  const y = today.getFullYear();
+  const m = today.getMonth();
+  if (m >= 4 && m <= 9) return y; // May–Oct → upcoming season
+  if (m >= 10) return y; // Nov–Dec → season starts this year
+  return y - 1; // Jan–Apr → season started last November
 }
 
-function isBeyondCalendarView(checkin, checkout, months) {
-  const end = calendarViewEnd(months);
+function getSkiSeasonMonths(today = new Date()) {
+  const startYear = getSkiSeasonStartYear(today);
+  return SKI_SEASON_MONTHS.map((month) => {
+    const year = month >= 10 ? startYear : startYear + 1;
+    return new Date(year, month, 1);
+  });
+}
+
+function calendarViewStart(today = new Date()) {
+  return getSkiSeasonMonths(today)[0];
+}
+
+function calendarViewEnd(today = new Date()) {
+  const apr = getSkiSeasonMonths(today)[5];
+  return new Date(apr.getFullYear(), apr.getMonth() + 1, 0);
+}
+
+function isBeyondCalendarView(checkin, checkout) {
+  const start = calendarViewStart();
+  const end = calendarViewEnd();
   const ci = new Date(checkin + "T00:00:00");
   const co = new Date(checkout + "T00:00:00");
-  return ci > end || co > end;
+  return ci < start || co > end;
 }
 
-function renderScopeNote(section, months) {
+function renderScopeNote(section) {
   const note = section?.querySelector(".availability__scope");
   if (!note) return;
-  const today = new Date();
-  const fromDt = new Date(today.getFullYear(), today.getMonth(), 1);
-  const lastMonth = new Date(today.getFullYear(), today.getMonth() + months - 1, 1);
-  const toDt = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0);
-  const tpl = STR.calendar_scope || "Calendar shows the next {months} months ({from} – {to}).";
+  const months = getSkiSeasonMonths();
+  const fromDt = months[0];
+  const toDt = calendarViewEnd();
+  const tpl = STR.calendar_scope || "Ski season: {from} – {to}.";
   note.textContent = tpl
-    .replace("{months}", String(months))
     .replace("{from}", fmtDate(fromDt, { month: "long", year: "numeric" }))
     .replace("{to}", fmtDate(toDt, { month: "long", year: "numeric" }));
   note.hidden = false;
@@ -167,11 +189,10 @@ function monthGrid(year, month, statusByDate, today) {
 
 function renderCalendar(grid, statusByDate) {
   const today = new Date();
-  const months = parseInt(grid.dataset.months || "3", 10);
+  const seasonMonths = getSkiSeasonMonths(today);
   const dows = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
   let html = "";
-  for (let m = 0; m < months; m++) {
-    const dt = new Date(today.getFullYear(), today.getMonth() + m, 1);
+  for (const dt of seasonMonths) {
     const cells = monthGrid(dt.getFullYear(), dt.getMonth(), statusByDate, today);
     const title = new Intl.DateTimeFormat(CFG.lang, { month: "long", year: "numeric" }).format(dt);
     html += `<div class="cal"><h3 class="cal__title">${title}</h3><div class="cal__grid">`;
@@ -193,13 +214,11 @@ async function initCalendar() {
   const grid = document.querySelector(".availability__grid");
   if (!grid) return;
   const slug = grid.dataset.slug;
-  const months = parseInt(grid.dataset.months || "3", 10);
-  const today = new Date();
-  const from = new Date(today.getFullYear(), today.getMonth(), 1);
-  const to = calendarViewEnd(months);
+  const from = calendarViewStart();
+  const to = calendarViewEnd();
   const statusByDate = await ensureAvailability(slug, from, to);
   renderCalendar(grid, statusByDate);
-  renderScopeNote(grid.closest(".availability"), months);
+  renderScopeNote(grid.closest(".availability"));
 }
 
 // ---------- Booking widget ----------
@@ -225,7 +244,6 @@ function initBooking() {
   const errorBox = widget.querySelector(".booking__error");
   const subtitle = widget.querySelector(".booking__subtitle");
   const guestSection = widget.querySelector(".booking__guest");
-  const calendarMonths = parseInt(document.querySelector(".availability__grid")?.dataset.months || "3", 10);
 
   // Default checkin = today + 7, checkout = today + 10
   const today = new Date();
@@ -271,8 +289,8 @@ function initBooking() {
         setSubmitEnabled(false);
         return;
       }
-      if (isBeyondCalendarView(ci, co, calendarMonths)) {
-        showHint(STR.beyond_calendar || "Your dates are beyond the calendar view; availability was checked.");
+      if (isBeyondCalendarView(ci, co)) {
+        showHint(STR.beyond_calendar || "Your dates are outside the ski season calendar; availability was checked.");
       } else {
         showHint("");
       }

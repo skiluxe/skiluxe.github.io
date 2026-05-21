@@ -103,8 +103,8 @@
 .legend--blocked { background: var(--navy); }
 .availability__grid {
   display: grid;
-  gap: 32px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .cal {
   border: 1px solid var(--line);
@@ -251,8 +251,10 @@
 @media (max-width: 1000px) {
   .apartment__layout { grid-template-columns: 1fr; }
   .booking { position: static; }
+  .availability__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
   .booking__row { grid-template-columns: 1fr; }
   .gallery__hero { aspect-ratio: 4 / 3; }
+  .availability__grid { grid-template-columns: 1fr; }
 }

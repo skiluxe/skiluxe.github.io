@@ -150,7 +150,7 @@ cd worker && npx wrangler tail
 ## 8. Verify end-to-end
 
 1. Browse `https://www.new-gudauri.com/en/` → homepage loads, all 4 languages switch correctly, Hebrew flips to RTL.
-2. Open an apartment detail → availability calendar renders (3 months ahead).
+2. Open an apartment detail → availability calendar renders (Nov–Apr ski season, 3×2 grid).
 3. Submit a test booking with your own email → you receive owner email + WhatsApp + guest email.
 4. Sign in at `/admin/` → confirm the test booking; status flips to confirmed.
 5. Subscribe `https://api.new-gudauri.com/api/ical/f2-one-bedroom.ics` from Google Calendar → confirmed dates show up.

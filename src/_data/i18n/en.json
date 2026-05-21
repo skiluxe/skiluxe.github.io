@@ -121,8 +121,8 @@
     "available": "Available",
     "blocked": "Booked",
     "pending": "On hold",
-    "scope_note": "Calendar shows the next {months} months ({from} – {to}). You can select any future dates in the booking form — we'll verify availability before holding.",
-    "beyond_calendar": "Your dates are beyond the calendar view; availability was checked for your selection."
+    "scope_note": "Ski season (November–April): {from} – {to}. Book other dates in the form — we'll verify availability before holding.",
+    "beyond_calendar": "Your dates are outside the ski season calendar; availability was checked for your selection."
   },
   "about": {
     "title": "About SkiLuxe",
