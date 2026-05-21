@@ -27,9 +27,10 @@
     <div class="site-footer__col">
       <h4>{{ i18n[lang].footer.contact }}</h4>
       <ul>
-        <li><a href="https://wa.me/{{ site.whatsapp | replace('+', '') }}">{{ site.whatsappDisplay }}</a></li>
+        <li><a href="https://wa.me/{{ site.whatsapp | replace('+', '') | replace(' ', '') }}">{{ site.whatsappDisplay }}</a></li>
         <li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
-        <li><a href="https://instagram.com/{{ site.instagram }}">@{{ site.instagram }}</a></li>
+        <li><a href="{{ site.instagramUrl }}" rel="noopener noreferrer">@{{ site.instagram }}</a></li>
+        <li><a href="{{ site.telegramUrl }}" rel="noopener noreferrer">@{{ site.telegram }}</a></li>
       </ul>
     </div>
   </div>

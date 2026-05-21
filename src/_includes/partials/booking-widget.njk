@@ -73,7 +73,7 @@
     <div class="booking__success" hidden>
       <h3>{{ i18n[lang].booking.success_title }}</h3>
       <p class="booking__success-text"></p>
-      <a class="btn btn--ghost" href="https://wa.me/{{ site.whatsapp | replace('+', '') }}">{{ i18n[lang].contact.whatsapp }}</a>
+      <a class="btn btn--ghost" href="https://wa.me/{{ site.whatsapp | replace('+', '') | replace(' ', '') }}">{{ i18n[lang].contact.whatsapp }}</a>
     </div>
     <div class="booking__error" role="alert" hidden></div>
   </form>

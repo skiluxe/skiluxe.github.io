@@ -138,6 +138,8 @@
     "whatsapp": "WhatsApp",
     "email": "Email",
     "instagram": "Instagram",
+    "telegram": "Telegram",
+    "telegram_hint": "Доступность апартаментов — @SkiluxeBot",
     "directions_title": "Как добраться",
     "directions_text": "Из аэропорта Тбилиси — частный трансфер 2 ч. Можем организовать сами, напишите заранее.",
     "checkin_title": "Заселение",

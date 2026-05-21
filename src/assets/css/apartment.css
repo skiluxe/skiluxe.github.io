@@ -150,9 +150,11 @@
   position: sticky;
   top: 96px;
   background: var(--snow);
-  border: 1px solid var(--line);
+  border: 1px solid rgba(201, 168, 76, 0.22);
   border-radius: var(--radius-lg);
   padding: 28px;
+  box-shadow: var(--shadow-sm), 0 0 0 1px rgba(201, 168, 76, 0.06);
+}
   box-shadow: var(--shadow-md);
 }
 .booking__head { padding-block-end: 16px; border-block-end: 1px solid var(--line); margin-block-end: 20px; }

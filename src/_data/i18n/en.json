@@ -139,6 +139,8 @@
     "whatsapp": "WhatsApp",
     "email": "Email",
     "instagram": "Instagram",
+    "telegram": "Telegram",
+    "telegram_hint": "Apartment availability — @SkiluxeBot",
     "directions_title": "Getting here",
     "directions_text": "From Tbilisi international airport, a private transfer takes 2h. We can arrange one — message us in advance.",
     "checkin_title": "Check-in",

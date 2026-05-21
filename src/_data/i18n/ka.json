@@ -138,6 +138,8 @@
     "whatsapp": "WhatsApp",
     "email": "Email",
     "instagram": "Instagram",
+    "telegram": "Telegram",
+    "telegram_hint": "თავისუფელი თარიღები — @SkiluxeBot",
     "directions_title": "როგორ მოხვალთ",
     "directions_text": "თბილისის აეროპორტიდან — კერძო ტრანსფერი 2 სთ-ში. შეგვიძლია მოვაწყოთ — წინასწარ მოგვწერეთ.",
     "checkin_title": "ჩასახლება",
