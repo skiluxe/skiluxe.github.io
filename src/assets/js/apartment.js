@@ -248,9 +248,15 @@ function initBooking() {
   // Default checkin = today + 7, checkout = today + 10
   const today = new Date();
   const defIn = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
-  const defOut = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 10);
   checkin.min = ymd(today);
   checkout.min = ymd(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1));
+
+  function syncCheckoutFromCheckin() {
+    if (!checkin.value) return;
+    const ciD = new Date(checkin.value + "T00:00:00");
+    checkout.min = ymd(new Date(ciD.getFullYear(), ciD.getMonth(), ciD.getDate() + 2));
+    checkout.value = ymd(new Date(ciD.getFullYear(), ciD.getMonth(), ciD.getDate() + 3));
+  }
 
   function showError(msg) {
     errorBox.textContent = msg;
@@ -356,14 +362,22 @@ function initBooking() {
     showHint("");
   }
 
-  [checkin, checkout, guests, nonRefundable].forEach((el) => {
+  checkin.addEventListener("change", () => {
+    syncCheckoutFromCheckin();
+    refreshQuote();
+  });
+  checkin.addEventListener("input", () => {
+    syncCheckoutFromCheckin();
+    refreshQuote();
+  });
+  [checkout, guests, nonRefundable].forEach((el) => {
     el.addEventListener("change", refreshQuote);
     el.addEventListener("input", refreshQuote);
   });
 
   // Set defaults & initial quote
   checkin.value = ymd(defIn);
-  checkout.value = ymd(defOut);
+  syncCheckoutFromCheckin();
   refreshQuote();
 
   form.addEventListener("submit", async (e) => {
