@@ -47,16 +47,17 @@ export async function bookingsForApartmentRange(
   db: D1Database,
   apartmentId: number,
   from: string,
-  to: string
+  to: string,
+  now = Date.now()
 ): Promise<Booking[]> {
   const { results } = await db
     .prepare(
       `SELECT * FROM bookings
        WHERE apartment_id = ?
-         AND status IN ('pending','confirmed')
+         AND (status = 'confirmed' OR (status = 'pending' AND hold_expires_at >= ?))
          AND NOT (checkout <= ? OR checkin >= ?)`
     )
-    .bind(apartmentId, from, to)
+    .bind(apartmentId, now, from, to)
     .all<Booking>();
   return results || [];
 }
@@ -82,17 +83,18 @@ export async function isRangeAvailable(
   db: D1Database,
   apartmentId: number,
   checkin: string,
-  checkout: string
+  checkout: string,
+  now = Date.now()
 ): Promise<boolean> {
   const conflictingBooking = await db
     .prepare(
       `SELECT id FROM bookings
        WHERE apartment_id = ?
-         AND status IN ('pending','confirmed')
+         AND (status = 'confirmed' OR (status = 'pending' AND hold_expires_at >= ?))
          AND NOT (checkout <= ? OR checkin >= ?)
        LIMIT 1`
     )
-    .bind(apartmentId, checkin, checkout)
+    .bind(apartmentId, now, checkin, checkout)
     .first();
   if (conflictingBooking) return false;
 

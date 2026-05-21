@@ -51,6 +51,8 @@ function initGallery() {
 }
 
 // ---------- Availability calendar ----------
+const availabilityCache = { slug: null, from: null, to: null, dates: {} };
+
 async function fetchAvailability(slug, from, to) {
   if (!apiBase) return { dates: {} };
   try {
@@ -61,6 +63,91 @@ async function fetchAvailability(slug, from, to) {
   } catch (_) {
     return { dates: {} };
   }
+}
+
+function parseStatusMap(data) {
+  const statusByDate = {};
+  if (Array.isArray(data.dates)) {
+    for (const d of data.dates) statusByDate[d.date] = d.status;
+  } else if (data.dates && typeof data.dates === "object") {
+    Object.assign(statusByDate, data.dates);
+  }
+  return statusByDate;
+}
+
+async function ensureAvailability(slug, fromDate, toDate) {
+  const from = ymd(fromDate);
+  const to = ymd(toDate);
+
+  if (
+    availabilityCache.slug === slug &&
+    availabilityCache.from &&
+    availabilityCache.to &&
+    from >= availabilityCache.from &&
+    to <= availabilityCache.to
+  ) {
+    return availabilityCache.dates;
+  }
+
+  let fetchFrom = fromDate;
+  let fetchTo = toDate;
+  if (availabilityCache.slug === slug && availabilityCache.from && availabilityCache.to) {
+    const cacheFrom = new Date(availabilityCache.from + "T00:00:00");
+    const cacheTo = new Date(availabilityCache.to + "T00:00:00");
+    if (cacheFrom < fetchFrom) fetchFrom = cacheFrom;
+    if (cacheTo > fetchTo) fetchTo = cacheTo;
+  }
+
+  if (availabilityCache.slug !== slug) {
+    availabilityCache.dates = {};
+    availabilityCache.slug = slug;
+    availabilityCache.from = null;
+    availabilityCache.to = null;
+  }
+
+  const data = await fetchAvailability(slug, fetchFrom, fetchTo);
+  Object.assign(availabilityCache.dates, parseStatusMap(data));
+  availabilityCache.from = ymd(fetchFrom);
+  availabilityCache.to = ymd(fetchTo);
+  return availabilityCache.dates;
+}
+
+function isRangeUnavailable(checkin, checkout, statusByDate) {
+  let cur = new Date(checkin + "T00:00:00");
+  const stop = new Date(checkout + "T00:00:00");
+  while (cur < stop) {
+    const st = statusByDate[ymd(cur)];
+    if (st === "blocked" || st === "pending") return true;
+    cur = new Date(cur.getTime() + 86400000);
+  }
+  return false;
+}
+
+function calendarViewEnd(months) {
+  const today = new Date();
+  return new Date(today.getFullYear(), today.getMonth() + months, 0);
+}
+
+function isBeyondCalendarView(checkin, checkout, months) {
+  const end = calendarViewEnd(months);
+  const ci = new Date(checkin + "T00:00:00");
+  const co = new Date(checkout + "T00:00:00");
+  return ci > end || co > end;
+}
+
+function renderScopeNote(section, months) {
+  const note = section?.querySelector(".availability__scope");
+  if (!note) return;
+  const today = new Date();
+  const fromDt = new Date(today.getFullYear(), today.getMonth(), 1);
+  const lastMonth = new Date(today.getFullYear(), today.getMonth() + months - 1, 1);
+  const toDt = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0);
+  const tpl = STR.calendar_scope || "Calendar shows the next {months} months ({from} – {to}).";
+  note.textContent = tpl
+    .replace("{months}", String(months))
+    .replace("{from}", fmtDate(fromDt, { month: "long", year: "numeric" }))
+    .replace("{to}", fmtDate(toDt, { month: "long", year: "numeric" }));
+  note.hidden = false;
 }
 
 function monthGrid(year, month, statusByDate, today) {
@@ -106,17 +193,13 @@ async function initCalendar() {
   const grid = document.querySelector(".availability__grid");
   if (!grid) return;
   const slug = grid.dataset.slug;
+  const months = parseInt(grid.dataset.months || "3", 10);
   const today = new Date();
   const from = new Date(today.getFullYear(), today.getMonth(), 1);
-  const to = new Date(today.getFullYear(), today.getMonth() + 4, 0);
-  const data = await fetchAvailability(slug, from, to);
-  const statusByDate = {};
-  if (Array.isArray(data.dates)) {
-    for (const d of data.dates) statusByDate[d.date] = d.status;
-  } else if (data.dates && typeof data.dates === "object") {
-    Object.assign(statusByDate, data.dates);
-  }
+  const to = calendarViewEnd(months);
+  const statusByDate = await ensureAvailability(slug, from, to);
   renderCalendar(grid, statusByDate);
+  renderScopeNote(grid.closest(".availability"), months);
 }
 
 // ---------- Booking widget ----------
@@ -142,6 +225,7 @@ function initBooking() {
   const errorBox = widget.querySelector(".booking__error");
   const subtitle = widget.querySelector(".booking__subtitle");
   const guestSection = widget.querySelector(".booking__guest");
+  const calendarMonths = parseInt(document.querySelector(".availability__grid")?.dataset.months || "3", 10);
 
   // Default checkin = today + 7, checkout = today + 10
   const today = new Date();
@@ -162,13 +246,38 @@ function initBooking() {
   }
 
   let quoteTimer;
+  let datesUnavailable = false;
+
+  function setSubmitEnabled(enabled) {
+    submit.disabled = !enabled;
+  }
+
   async function refreshQuote() {
     showError("");
+    datesUnavailable = false;
     const ci = checkin.value, co = checkout.value;
-    if (!ci || !co) { quoteBox.hidden = true; showHint(STR.select_dates); return; }
-    const ciD = new Date(ci), coD = new Date(co);
-    if (coD <= ciD) { quoteBox.hidden = true; showHint(STR.min_stay); return; }
-    if (diffDays(ciD, coD) < 2) { quoteBox.hidden = true; showHint(STR.min_stay); return; }
+    if (!ci || !co) { quoteBox.hidden = true; showHint(STR.select_dates); setSubmitEnabled(false); return; }
+    const ciD = new Date(ci + "T00:00:00"), coD = new Date(co + "T00:00:00");
+    if (coD <= ciD) { quoteBox.hidden = true; showHint(STR.min_stay); setSubmitEnabled(false); return; }
+    if (diffDays(ciD, coD) < 2) { quoteBox.hidden = true; showHint(STR.min_stay); setSubmitEnabled(false); return; }
+
+    if (apiBase) {
+      const statusByDate = await ensureAvailability(slug, ciD, coD);
+      if (isRangeUnavailable(ci, co, statusByDate)) {
+        quoteBox.hidden = true;
+        showHint("");
+        showError(STR.unavailable || "Dates no longer available. Please pick different dates.");
+        datesUnavailable = true;
+        setSubmitEnabled(false);
+        return;
+      }
+      if (isBeyondCalendarView(ci, co, calendarMonths)) {
+        showHint(STR.beyond_calendar || "Your dates are beyond the calendar view; availability was checked.");
+      } else {
+        showHint("");
+      }
+    }
+
     if (!apiBase) {
       // Offline / static-only: show a rough estimate from base rate
       const nights = diffDays(ciD, coD);
@@ -178,6 +287,7 @@ function initBooking() {
       quoteAmt.textContent = fmtMoney(base * nights, currency);
       quoteBox.hidden = false;
       showHint("");
+      setSubmitEnabled(true);
       return;
     }
     clearTimeout(quoteTimer);
@@ -193,12 +303,22 @@ function initBooking() {
             non_refundable: !!nonRefundable.checked,
           }),
         });
+        if (res.status === 409) {
+          quoteBox.hidden = true;
+          showHint("");
+          showError(STR.unavailable || "Dates no longer available. Please pick different dates.");
+          datesUnavailable = true;
+          setSubmitEnabled(false);
+          return;
+        }
         if (!res.ok) throw new Error("quote failed");
         const q = await res.json();
         renderQuote(q);
+        setSubmitEnabled(true);
       } catch (e) {
         quoteBox.hidden = true;
         showHint("");
+        setSubmitEnabled(false);
       }
     }, 250);
   }
@@ -231,6 +351,10 @@ function initBooking() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     showError("");
+    if (datesUnavailable) {
+      showError(STR.unavailable || "Dates no longer available. Please pick different dates.");
+      return;
+    }
     const fd = new FormData(form);
     const ci = String(fd.get("checkin") || "");
     const co = String(fd.get("checkout") || "");
@@ -262,6 +386,7 @@ function initBooking() {
       });
       if (res.status === 409) {
         showError(STR.unavailable || "Dates no longer available. Please pick different dates.");
+        datesUnavailable = true;
         return;
       }
       if (res.status === 429) {
@@ -286,7 +411,7 @@ function initBooking() {
     } catch (err) {
       showError(STR.error_generic || "Something went wrong. Please try again or message us on WhatsApp.");
     } finally {
-      submit.disabled = false;
+      if (!datesUnavailable && !submit.hidden) submit.disabled = false;
       submitIdle.hidden = false;
       submitBusy.hidden = true;
     }

@@ -107,6 +107,9 @@ publicRoutes.post("/apartments/:slug/quote", async (c) => {
   const apt = await getApartmentBySlug(c.env.DB, slug);
   if (!apt) return c.json({ error: "not_found" }, 404);
 
+  const available = await isRangeAvailable(c.env.DB, apt.id, checkin, checkout);
+  if (!available) return c.json({ error: "unavailable" }, 409);
+
   const [seasons, overrides, promos] = await Promise.all([
     listSeasons(c.env.DB, apt.id),
     listDateOverrides(c.env.DB, apt.id, checkin, checkout),

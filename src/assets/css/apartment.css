@@ -137,6 +137,14 @@
 .cal__cell.is-pending { background: rgba(168, 114, 72, 0.18); color: var(--bronze-2); border: 1px solid rgba(168, 114, 72, 0.4); }
 .cal__cell.is-blocked { background: var(--navy); color: var(--snow); }
 
+.availability__scope {
+  margin: 20px 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+  max-width: 52ch;
+}
+
 /* ------- Booking widget ------- */
 .booking {
   position: sticky;
