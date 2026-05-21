@@ -122,7 +122,7 @@ publicRoutes.post("/bookings", async (c) => {
   const ip = c.req.header("CF-Connecting-IP") || "unknown";
   const rlKey = `ratelimit:booking:${ip}`;
   const count = parseInt((await c.env.KV.get(rlKey)) || "0", 10);
-  if (count >= 5) return c.json({ error: "rate_limited" }, 429);
+  if (count >= 15) return c.json({ error: "rate_limited", retry_after_sec: 600 }, 429);
   await c.env.KV.put(rlKey, String(count + 1), { expirationTtl: 600 });
 
   const body = await c.req.json().catch(() => ({}));
@@ -170,7 +170,11 @@ publicRoutes.post("/bookings", async (c) => {
   ).run();
 
   const bookingId = Number(result.meta.last_row_id);
-  await audit(c.env.DB, "guest", "booking.create", "bookings", bookingId, { slug: apt.slug, ip, total: q.total });
+  try {
+    await audit(c.env.DB, "guest", "booking.create", "bookings", bookingId, { slug: apt.slug, ip, total: q.total });
+  } catch (e) {
+    console.error("audit booking.create:", e);
+  }
 
   // Fire and forget notifications
   c.executionCtx.waitUntil(notifyOwnerAndGuest(c.env, bookingId, apt, {
@@ -233,12 +237,15 @@ async function notifyOwnerAndGuest(env: Env, bookingId: number, apt: Apartment, 
   notes: string | null;
 }) {
   const ownerMail = bookingOwnerEmail({ ...b, apartment_slug: apt.slug }, env.SITE_ORIGIN);
-  await sendEmail(env, [{ email: env.OWNER_EMAIL }], ownerMail.subject, ownerMail.text, ownerMail.html);
+  console.log(`booking #${bookingId} notify → owner:${env.OWNER_EMAIL} guest:${b.guest_email}`);
+  const ownerRes = await sendEmail(env, [{ email: env.OWNER_EMAIL }], ownerMail.subject, ownerMail.text, ownerMail.html);
+  console.log(`booking #${bookingId} owner email:`, ownerRes.ok ? "ok" : ownerRes.error);
 
   const lookupToken = await signToken(env, `booking:${bookingId}`);
   const lookupUrl = `${env.SITE_ORIGIN}/${b.guest_lang || "en"}/booking/?id=${bookingId}&token=${lookupToken}`;
   const guestMail = bookingGuestEmail({ ...b, apartment_slug: apt.unit_label }, lookupUrl);
-  await sendEmail(env, [{ email: b.guest_email, name: b.guest_name }], guestMail.subject, guestMail.text, guestMail.html);
+  const guestRes = await sendEmail(env, [{ email: b.guest_email, name: b.guest_name }], guestMail.subject, guestMail.text, guestMail.html);
+  console.log(`booking #${bookingId} guest email:`, guestRes.ok ? "ok" : guestRes.error);
 
   await sendWhatsApp(env, `SkiLuxe booking #${bookingId} — ${apt.slug} ${b.checkin}→${b.checkout} ${b.currency} ${(b.total_amount/100).toFixed(0)} — confirm: ${env.SITE_ORIGIN}/admin/`);
 }

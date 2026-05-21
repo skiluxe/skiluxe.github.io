@@ -6,6 +6,29 @@ interface MailRecipient {
   name?: string;
 }
 
+async function mailchannelsSend(
+  env: Env,
+  body: Record<string, unknown>
+): Promise<{ ok: boolean; error?: string; status?: number }> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (!env.MAILCHANNELS_API_KEY) {
+    return { ok: false, error: "MAILCHANNELS_API_KEY not configured" };
+  }
+  headers["X-Api-Key"] = env.MAILCHANNELS_API_KEY;
+
+  const res = await fetch("https://api.mailchannels.net/tx/v1/send", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+  const respText = await res.text();
+  if (!res.ok) {
+    return { ok: false, status: res.status, error: `mailchannels ${res.status}: ${respText.slice(0, 400)}` };
+  }
+  console.log("sendEmail ok:", res.status, respText.slice(0, 120));
+  return { ok: true, status: res.status };
+}
+
 export async function sendEmail(
   env: Env,
   to: MailRecipient[],
@@ -13,8 +36,12 @@ export async function sendEmail(
   text: string,
   html?: string
 ): Promise<{ ok: boolean; error?: string }> {
-  if (!env.MAIL_FROM) return { ok: false, error: "MAIL_FROM not configured" };
-  const body: any = {
+  if (!env.MAIL_FROM) {
+    console.error("sendEmail: MAIL_FROM not configured");
+    return { ok: false, error: "MAIL_FROM not configured" };
+  }
+
+  const base: Record<string, unknown> = {
     personalizations: [{ to }],
     from: { email: env.MAIL_FROM, name: "SkiLuxe New Gudauri" },
     subject,
@@ -24,25 +51,36 @@ export async function sendEmail(
     ],
   };
 
-  if (env.MAIL_DKIM_DOMAIN && env.MAIL_DKIM_SELECTOR && env.MAIL_DKIM_PRIVATE_KEY) {
-    body.personalizations[0].dkim_domain = env.MAIL_DKIM_DOMAIN;
-    body.personalizations[0].dkim_selector = env.MAIL_DKIM_SELECTOR;
-    body.personalizations[0].dkim_private_key = env.MAIL_DKIM_PRIVATE_KEY;
+  const hasDkim = !!(env.MAIL_DKIM_DOMAIN && env.MAIL_DKIM_SELECTOR && env.MAIL_DKIM_PRIVATE_KEY);
+  if (hasDkim) {
+    const p = base.personalizations as Record<string, unknown>[];
+    p[0] = {
+      ...p[0],
+      dkim_domain: env.MAIL_DKIM_DOMAIN,
+      dkim_selector: env.MAIL_DKIM_SELECTOR,
+      dkim_private_key: env.MAIL_DKIM_PRIVATE_KEY.trim(),
+    };
+    const withDkim = await mailchannelsSend(env, base);
+    if (withDkim.ok) return { ok: true };
+    console.error("sendEmail DKIM attempt failed:", withDkim.error);
+    // Retry without DKIM so booking notifications still deliver
   }
 
   try {
-    const res = await fetch("https://api.mailchannels.net/tx/v1/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    const plain: Record<string, unknown> = {
+      ...base,
+      personalizations: [{ to }],
+    };
+    const res = await mailchannelsSend(env, plain);
     if (!res.ok) {
-      const text = await res.text();
-      return { ok: false, error: `mailchannels ${res.status}: ${text.slice(0, 200)}` };
+      console.error("sendEmail failed:", res.error);
+      return { ok: false, error: res.error };
     }
     return { ok: true };
   } catch (e: any) {
-    return { ok: false, error: String(e?.message || e) };
+    const err = String(e?.message || e);
+    console.error("sendEmail error:", err);
+    return { ok: false, error: err };
   }
 }
 

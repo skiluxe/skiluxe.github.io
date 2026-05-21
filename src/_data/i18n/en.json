@@ -110,6 +110,7 @@
     "success_title": "Dates held",
     "success_text": "We've put a 24h hold on these dates and notified the owner. You'll hear back shortly to confirm payment details. Booking reference: {ref}.",
     "error_generic": "Something went wrong. Please try again or message us on WhatsApp.",
+    "rate_limited": "Too many booking attempts. Please wait 10 minutes and try again.",
     "error_unavailable": "Sorry — those dates are no longer available. Please pick different dates.",
     "select_dates": "Select dates to see the price",
     "min_stay": "Minimum 2 nights.",

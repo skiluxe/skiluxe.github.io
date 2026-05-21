@@ -35,3 +35,4 @@ crons = ["*/15 * * * *", "*/5 * * * *"]
 # MAIL_DKIM_DOMAIN      new-gudauri.com
 # MAIL_DKIM_SELECTOR    mailchannels
 # MAIL_DKIM_PRIVATE_KEY base64 of DKIM private key (PKCS8)
+# MAILCHANNELS_API_KEY  from MailChannels Console → API keys

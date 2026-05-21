@@ -31,6 +31,7 @@
       max_guests: {{ i18n[lang].booking.max_guests | dump | safe }},
       success_text: {{ i18n[lang].booking.success_text | dump | safe }},
       error_generic: {{ i18n[lang].booking.error_generic | dump | safe }},
+      rate_limited: {{ i18n[lang].booking.rate_limited | default(i18n[lang].booking.error_generic) | dump | safe }},
       unavailable: {{ i18n[lang].booking.error_unavailable | dump | safe }}
     };
   </script>

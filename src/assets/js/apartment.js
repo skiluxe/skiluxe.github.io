@@ -264,7 +264,15 @@ function initBooking() {
         showError(STR.unavailable || "Dates no longer available. Please pick different dates.");
         return;
       }
-      if (!res.ok) throw new Error("booking failed");
+      if (res.status === 429) {
+        showError(STR.rate_limited || "Too many booking attempts. Please wait 10 minutes and try again.");
+        return;
+      }
+      if (!res.ok) {
+        let detail = "";
+        try { const j = await res.json(); detail = j.error || ""; } catch (_) {}
+        throw new Error(detail || `booking failed ${res.status}`);
+      }
       const data = await res.json();
       const ref = data.reference || data.booking_id || "—";
       successText.textContent = (STR.success_text || "Dates held. Reference: {ref}.").replace("{ref}", ref);

@@ -83,7 +83,7 @@ wrangler secret put CALLMEBOT_API_KEY      # see callmebot.com/blog/free-api-wha
 wrangler secret put MAIL_FROM              # noreply@new-gudauri.com
 wrangler secret put MAIL_DKIM_DOMAIN       # new-gudauri.com
 wrangler secret put MAIL_DKIM_SELECTOR     # mailchannels
-wrangler secret put MAIL_DKIM_PRIVATE_KEY  # base64 PKCS8 DKIM private key
+wrangler secret put MAIL_DKIM_PRIVATE_KEY  # RSA DER base64 — run: ./scripts/fix-dkim-secret.sh
 ```
 
 Deploy:
@@ -105,12 +105,47 @@ The Worker is now reachable at `https://skiluxe-api.<your-subdomain>.workers.dev
    - `CNAME www    golbstein.github.io`
 3. GitHub Pages → set Custom Domain to `www.new-gudauri.com`. Enable "Enforce HTTPS" once SSL provisions (a few minutes).
 
-## 7. MailChannels DKIM
+## 7. MailChannels email (SPF + DKIM + Domain Lockdown + API key)
 
-MailChannels requires SPF + DKIM TXT records so your booking confirmation emails don't go to spam.
+The free “send from Workers with no account” tier ended in 2024. You need a **MailChannels Email API** account (free plan: 100 emails/day): https://www.mailchannels.com/email-api/
 
-- SPF: add `TXT @  "v=spf1 include:relay.mailchannels.net ~all"` (or merge with existing SPF).
-- DKIM: generate keypair and publish public key at `_dkim.<selector>._domainkey.new-gudauri.com`. See https://support.mailchannels.com/hc/en-us/articles/16918954360845-Set-up-DKIM-and-SPF-using-Cloudflare-Workers — same flow applies.
+### 7a. DNS (Cloudflare → `new-gudauri.com` → DNS)
+
+1. **SPF** on `@` (merge with existing, only one SPF TXT):
+   ```
+   v=spf1 include:spf.efwd.registrar-servers.com include:relay.mailchannels.net ~all
+   ```
+2. **DKIM** on `mailchannels._domainkey` (selector must match `MAIL_DKIM_SELECTOR` secret, usually `mailchannels`):
+   ```
+   v=DKIM1; k=rsa; p=<your-public-key-without-pem-headers>
+   ```
+3. **Domain Lockdown** on `_mailchannels` (required — without this, sends fail silently):
+   ```
+   v=mc1 auth=<YOUR_MAILCHANNELS_ACCOUNT_ID>
+   ```
+   Find **Account ID** in [MailChannels Console](https://console.mailchannels.net/settings/accountSettings) (upper right).  
+   Do **not** use `cfid=…workers.dev` — that method was retired Aug 2024.
+
+Verify:
+```bash
+dig @1.1.1.1 new-gudauri.com TXT +short
+dig @1.1.1.1 mailchannels._domainkey.new-gudauri.com TXT +short
+dig @1.1.1.1 _mailchannels.new-gudauri.com TXT +short
+```
+
+### 7b. Worker secrets
+
+```bash
+cd worker
+wrangler secret put MAILCHANNELS_API_KEY   # API key from MailChannels Console (api scope)
+# MAIL_FROM, MAIL_DKIM_*, OWNER_EMAIL should already be set from step 5
+wrangler deploy
+```
+
+After a test booking, check logs if mail fails:
+```bash
+cd worker && npx wrangler tail
+```
 
 ## 8. Verify end-to-end
 

@@ -16,6 +16,8 @@ export interface Env {
   MAIL_DKIM_DOMAIN: string;
   MAIL_DKIM_SELECTOR: string;
   MAIL_DKIM_PRIVATE_KEY: string;
+  /** MailChannels Email API key (required since 2024 Workers free tier ended). */
+  MAILCHANNELS_API_KEY: string;
 }
 
 export interface Apartment {
