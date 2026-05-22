@@ -201,6 +201,14 @@
 }
 .booking__quote-lines { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-direction: column; gap: 6px; }
 .booking__quote-lines li { display: flex; justify-content: space-between; gap: 12px; }
+.booking__guests-help {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.booking__quote-lines li.is-surcharge { color: var(--navy-3); }
 .booking__quote-lines li.is-discount { color: var(--bronze); }
 .booking__quote-total {
   display: flex;

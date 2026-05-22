@@ -120,9 +120,12 @@ export interface IcalEvent {
 export interface QuoteResult {
   nights: { date: string; rate: number }[];
   subtotal: number;
+  adjustments: { kind: string; label: string; amount: number; percent?: number }[];
   discounts: { kind: string; label: string; amount: number; percent?: number }[];
   total: number;
   currency: string;
   apartment_slug: string;
+  paying_guests: number;
+  infants: number;
   computed_at: number;
 }

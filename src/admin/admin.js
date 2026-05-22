@@ -292,7 +292,13 @@ async function renderBookingDetail(id) {
           el("td", {}, fmtMoney(n.rate, b.currency)),
         ]))),
       ]),
+      ...(quote.adjustments || []).map((a) => kv(
+        a.label || a.kind,
+        `${a.amount >= 0 ? "+" : "−"}${fmtMoney(Math.abs(a.amount), b.currency)}`
+      )),
       ...(quote.discounts || []).map((d) => kv(d.label || d.kind, `−${fmtMoney(d.amount, b.currency)}`)),
+      ...(quote.paying_guests != null ? [kv("Paying guests", String(quote.paying_guests))] : []),
+      ...(quote.infants ? [kv("Infants (free)", String(quote.infants))] : []),
       el("div", { style: "margin-top:12px;display:flex;justify-content:space-between;font-weight:600" }, [
         el("span", {}, "Subtotal"),
         el("span", {}, fmtMoney(quote.subtotal, b.currency)),

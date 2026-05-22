@@ -231,6 +231,7 @@ function initBooking() {
   const checkin = form.querySelector('[name="checkin"]');
   const checkout = form.querySelector('[name="checkout"]');
   const guests = form.querySelector('[name="guests"]');
+  const infants = form.querySelector('[name="infants"]');
   const nonRefundable = form.querySelector('[name="non_refundable"]');
   const quoteBox = widget.querySelector(".booking__quote");
   const quoteLines = widget.querySelector(".booking__quote-lines");
@@ -254,7 +255,7 @@ function initBooking() {
   function syncCheckoutFromCheckin() {
     if (!checkin.value) return;
     const ciD = new Date(checkin.value + "T00:00:00");
-    checkout.min = ymd(new Date(ciD.getFullYear(), ciD.getMonth(), ciD.getDate() + 2));
+    checkout.min = ymd(new Date(ciD.getFullYear(), ciD.getMonth(), ciD.getDate() + 1));
     checkout.value = ymd(new Date(ciD.getFullYear(), ciD.getMonth(), ciD.getDate() + 3));
   }
 
@@ -283,7 +284,7 @@ function initBooking() {
     if (!ci || !co) { quoteBox.hidden = true; showHint(STR.select_dates); setSubmitEnabled(false); return; }
     const ciD = new Date(ci + "T00:00:00"), coD = new Date(co + "T00:00:00");
     if (coD <= ciD) { quoteBox.hidden = true; showHint(STR.min_stay); setSubmitEnabled(false); return; }
-    if (diffDays(ciD, coD) < 2) { quoteBox.hidden = true; showHint(STR.min_stay); setSubmitEnabled(false); return; }
+    if (diffDays(ciD, coD) < 1) { quoteBox.hidden = true; showHint(STR.min_stay); setSubmitEnabled(false); return; }
 
     if (apiBase) {
       const statusByDate = await ensureAvailability(slug, ciD, coD);
@@ -324,6 +325,7 @@ function initBooking() {
             checkin: ci,
             checkout: co,
             guests: parseInt(guests.value, 10),
+            infants: parseInt(infants?.value || "0", 10),
             non_refundable: !!nonRefundable.checked,
           }),
         });
@@ -347,14 +349,33 @@ function initBooking() {
     }, 250);
   }
 
+  function adjustmentLabel(a) {
+    if (a.kind === "single_night") return STR.single_night_surcharge || a.label;
+    if (a.kind === "occupancy_single") return STR.single_occupancy_discount || a.label;
+    if (a.kind === "occupancy_extra") {
+      return (STR.extra_guests_surcharge || a.label).replace("{percent}", String(a.percent ?? ""));
+    }
+    if (a.kind === "weekly") return STR.weekly_discount || a.label;
+    if (a.kind === "non_refundable") return STR.non_refundable_discount || a.label;
+    return a.label || a.kind;
+  }
+
   function renderQuote(q) {
     const cur = q.currency || "GEL";
     const nightsCount = (q.nights || []).length;
     const nightlyAvg = nightsCount ? Math.round(q.subtotal / nightsCount) : 0;
     const lines = [];
     lines.push(`<li><span>${nightsCount} × ${fmtMoney(nightlyAvg, cur)}</span><span>${fmtMoney(q.subtotal, cur)}</span></li>`);
+    for (const a of q.adjustments || []) {
+      const label = adjustmentLabel(a);
+      if (a.amount >= 0) {
+        lines.push(`<li class="is-surcharge"><span>${label}</span><span>+${fmtMoney(a.amount, cur)}</span></li>`);
+      } else {
+        lines.push(`<li class="is-discount"><span>${label}</span><span>−${fmtMoney(Math.abs(a.amount), cur)}</span></li>`);
+      }
+    }
     for (const d of q.discounts || []) {
-      lines.push(`<li class="is-discount"><span>${d.label || d.kind}</span><span>−${fmtMoney(d.amount, cur)}</span></li>`);
+      lines.push(`<li class="is-discount"><span>${adjustmentLabel(d)}</span><span>−${fmtMoney(d.amount, cur)}</span></li>`);
     }
     quoteLines.innerHTML = lines.join("");
     quoteAmt.textContent = fmtMoney(q.total, cur);
@@ -370,7 +391,8 @@ function initBooking() {
     syncCheckoutFromCheckin();
     refreshQuote();
   });
-  [checkout, guests, nonRefundable].forEach((el) => {
+  [checkout, guests, infants, nonRefundable].forEach((el) => {
+    if (!el) return;
     el.addEventListener("change", refreshQuote);
     el.addEventListener("input", refreshQuote);
   });
@@ -390,8 +412,12 @@ function initBooking() {
     const fd = new FormData(form);
     const ci = String(fd.get("checkin") || "");
     const co = String(fd.get("checkout") || "");
-    const g = parseInt(String(fd.get("guests") || "1"), 10);
-    if (g > maxGuests) { showError(`Maximum ${maxGuests} guests for this apartment.`); return; }
+    const g = parseInt(String(fd.get("guests") || "2"), 10);
+    const infantCount = parseInt(String(fd.get("infants") || "0"), 10);
+    if (g + infantCount > maxGuests) {
+      showError((STR.max_guests || "Maximum {n} guests for this apartment.").replace("{n}", String(maxGuests)));
+      return;
+    }
     if (!apiBase) { showError("Booking API not configured yet."); return; }
 
     submit.disabled = true;
@@ -406,6 +432,7 @@ function initBooking() {
           checkin: ci,
           checkout: co,
           guests_count: g,
+          infants_count: infantCount,
           non_refundable: !!fd.get("non_refundable"),
           guest: {
             name: String(fd.get("name") || ""),

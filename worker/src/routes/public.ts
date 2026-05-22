@@ -102,11 +102,12 @@ publicRoutes.post("/apartments/:slug/quote", async (c) => {
   const parsed = QuoteInput.safeParse(body);
   if (!parsed.success) return c.json({ error: "invalid_input", details: parsed.error.flatten() }, 400);
 
-  const { checkin, checkout, non_refundable } = parsed.data;
+  const { checkin, checkout, guests, infants, non_refundable } = parsed.data;
   if (nightsBetween(checkin, checkout) < 1) return c.json({ error: "invalid_range" }, 400);
 
   const apt = await getApartmentBySlug(c.env.DB, slug);
   if (!apt) return c.json({ error: "not_found" }, 404);
+  if (guests + infants > apt.max_guests) return c.json({ error: "too_many_guests", max: apt.max_guests }, 400);
 
   const available = await isRangeAvailable(c.env.DB, apt.id, checkin, checkout);
   if (!available) return c.json({ error: "unavailable" }, 409);
@@ -117,7 +118,11 @@ publicRoutes.post("/apartments/:slug/quote", async (c) => {
     listActivePromotions(c.env.DB, apt.id),
   ]);
   const overridesByDate = new Map(overrides.map((o) => [o.date, o]));
-  const q = buildQuote(apt, seasons, overridesByDate, promos, checkin, checkout, { non_refundable });
+  const q = buildQuote(apt, seasons, overridesByDate, promos, checkin, checkout, {
+    non_refundable,
+    paying_guests: guests,
+    infants,
+  });
   return c.json(q);
 });
 
@@ -132,12 +137,12 @@ publicRoutes.post("/bookings", async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const parsed = BookingInput.safeParse(body);
   if (!parsed.success) return c.json({ error: "invalid_input", details: parsed.error.flatten() }, 400);
-  const { apartment_slug, checkin, checkout, guests_count, non_refundable, guest } = parsed.data;
-  if (nightsBetween(checkin, checkout) < 2) return c.json({ error: "min_stay" }, 400);
+  const { apartment_slug, checkin, checkout, guests_count, infants_count, non_refundable, guest } = parsed.data;
+  if (nightsBetween(checkin, checkout) < 1) return c.json({ error: "min_stay" }, 400);
 
   const apt = await getApartmentBySlug(c.env.DB, apartment_slug);
   if (!apt) return c.json({ error: "not_found" }, 404);
-  if (guests_count > apt.max_guests) return c.json({ error: "too_many_guests", max: apt.max_guests }, 400);
+  if (guests_count + infants_count > apt.max_guests) return c.json({ error: "too_many_guests", max: apt.max_guests }, 400);
 
   const available = await isRangeAvailable(c.env.DB, apt.id, checkin, checkout);
   if (!available) return c.json({ error: "unavailable" }, 409);
@@ -148,7 +153,11 @@ publicRoutes.post("/bookings", async (c) => {
     listActivePromotions(c.env.DB, apt.id),
   ]);
   const overridesByDate = new Map(overrides.map((o) => [o.date, o]));
-  const q = buildQuote(apt, seasons, overridesByDate, promos, checkin, checkout, { non_refundable });
+  const q = buildQuote(apt, seasons, overridesByDate, promos, checkin, checkout, {
+    non_refundable,
+    paying_guests: guests_count,
+    infants: infants_count,
+  });
 
   const holdMs = (parseInt(c.env.HOLD_HOURS || "24", 10) || 24) * 60 * 60 * 1000;
   const holdExpires = Date.now() + holdMs;

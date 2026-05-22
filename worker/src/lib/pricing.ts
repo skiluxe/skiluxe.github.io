@@ -1,5 +1,10 @@
 import type { Apartment, DateOverride, Promotion, QuoteResult, Season } from "../types";
 
+export const BASE_OCCUPANCY = 2;
+const SINGLE_NIGHT_SURCHARGE = 0.2;
+const SINGLE_OCCUPANCY_DISCOUNT = 0.05;
+const EXTRA_GUEST_SURCHARGE = 0.1;
+
 function parseDate(s: string): Date {
   return new Date(s + "T00:00:00Z");
 }
@@ -27,6 +32,32 @@ function findSeason(seasons: Season[], date: string): Season | null {
   return best;
 }
 
+function occupancyAdjustment(
+  base: number,
+  payingGuests: number
+): QuoteResult["adjustments"][number] | null {
+  if (payingGuests < 1) return null;
+  if (payingGuests === 1) {
+    return {
+      kind: "occupancy_single",
+      label: "Single occupancy (-5%)",
+      amount: -Math.round(base * SINGLE_OCCUPANCY_DISCOUNT),
+      percent: 5,
+    };
+  }
+  if (payingGuests > BASE_OCCUPANCY) {
+    const extra = payingGuests - BASE_OCCUPANCY;
+    const percent = extra * EXTRA_GUEST_SURCHARGE * 100;
+    return {
+      kind: "occupancy_extra",
+      label: `Extra guests (+${percent}%)`,
+      amount: Math.round(base * extra * EXTRA_GUEST_SURCHARGE),
+      percent,
+    };
+  }
+  return null;
+}
+
 export function quote(
   apartment: Apartment,
   seasons: Season[],
@@ -34,8 +65,10 @@ export function quote(
   promos: Promotion[],
   checkin: string,
   checkout: string,
-  flags: { non_refundable?: boolean } = {}
+  flags: { non_refundable?: boolean; paying_guests?: number; infants?: number } = {}
 ): QuoteResult {
+  const payingGuests = Math.max(1, flags.paying_guests ?? BASE_OCCUPANCY);
+  const infants = Math.max(0, flags.infants ?? 0);
   const dates = eachDate(checkin, checkout);
   const nights: { date: string; rate: number }[] = [];
   for (const d of dates) {
@@ -54,7 +87,24 @@ export function quote(
 
   const subtotal = nights.reduce((acc, n) => acc + n.rate, 0);
   const totalNights = nights.length;
+  const adjustments: QuoteResult["adjustments"] = [];
 
+  let adjustedBase = subtotal;
+  if (totalNights === 1) {
+    const amount = Math.round(subtotal * SINGLE_NIGHT_SURCHARGE);
+    adjustments.push({
+      kind: "single_night",
+      label: "Single-night stay (+20%)",
+      amount,
+      percent: 20,
+    });
+    adjustedBase += amount;
+  }
+
+  const occ = occupancyAdjustment(adjustedBase, payingGuests);
+  if (occ) adjustments.push(occ);
+
+  const afterAdjustments = subtotal + adjustments.reduce((acc, a) => acc + a.amount, 0);
   const discounts: QuoteResult["discounts"] = [];
 
   const weekly = promos.find((p) => p.kind === "weekly" && p.active);
@@ -63,7 +113,7 @@ export function quote(
     const minNights = params.min_nights || 7;
     const percent = params.percent || 10;
     if (totalNights >= minNights) {
-      const amount = Math.round((subtotal * percent) / 100);
+      const amount = Math.round((afterAdjustments * percent) / 100);
       discounts.push({ kind: "weekly", label: "Weekly stay", amount, percent });
     }
   }
@@ -73,20 +123,23 @@ export function quote(
     const params = parseJson(nr.params_json);
     const percent = params.percent || 15;
     const alreadyApplied = discounts.reduce((a, d) => a + d.amount, 0);
-    const base = nr.stackable ? subtotal - alreadyApplied : subtotal;
+    const base = nr.stackable ? afterAdjustments - alreadyApplied : afterAdjustments;
     const amount = Math.round((base * percent) / 100);
     discounts.push({ kind: "non_refundable", label: "Non-refundable", amount, percent });
   }
 
-  const total = subtotal - discounts.reduce((acc, d) => acc + d.amount, 0);
+  const total = afterAdjustments - discounts.reduce((acc, d) => acc + d.amount, 0);
 
   return {
     nights,
     subtotal,
+    adjustments,
     discounts,
     total,
     currency: apartment.currency,
     apartment_slug: apartment.slug,
+    paying_guests: payingGuests,
+    infants,
     computed_at: Date.now(),
   };
 }

@@ -6,7 +6,10 @@ const dateString = z.string().regex(ymd, "Date must be YYYY-MM-DD");
 export const QuoteInput = z.object({
   checkin: dateString,
   checkout: dateString,
+  /** Paying guests aged 3+ (same rate as adults). */
   guests: z.number().int().positive().max(20).default(2),
+  /** Infants aged 0–3 (free, not counted in occupancy pricing). */
+  infants: z.number().int().min(0).max(10).default(0),
   non_refundable: z.boolean().optional().default(false),
 });
 
@@ -14,7 +17,9 @@ export const BookingInput = z.object({
   apartment_slug: z.string().min(1).max(80),
   checkin: dateString,
   checkout: dateString,
+  /** Paying guests aged 3+ (same rate as adults). */
   guests_count: z.number().int().positive().max(20),
+  infants_count: z.number().int().min(0).max(10).optional().default(0),
   non_refundable: z.boolean().optional().default(false),
   guest: z.object({
     name: z.string().min(2).max(120),
