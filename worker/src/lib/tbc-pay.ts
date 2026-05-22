@@ -29,6 +29,33 @@ export function isTbcConfigured(env: Env): boolean {
   return !!(env.TBC_API_KEY && env.TBC_CLIENT_ID && env.TBC_CLIENT_SECRET);
 }
 
+/** Test TBC credentials without creating a payment. */
+export async function testTbcCredentials(env: Env): Promise<{
+  configured: boolean;
+  tokenOk: boolean;
+  error?: string;
+  systemCode?: string;
+}> {
+  if (!isTbcConfigured(env)) {
+    return { configured: false, tokenOk: false, error: "TBC secrets not set" };
+  }
+  try {
+    await env.KV.delete(TOKEN_CACHE_KEY);
+    await getTbcAccessToken(env);
+    return { configured: true, tokenOk: true };
+  } catch (e: any) {
+    const msg = String(e?.message || e);
+    const systemCode = msg.match(/tpay-access-token\.\d+\.\d+/)?.[0]
+      || msg.match(/"systemCode":\s*"[^"]*?(tpay[^"]+)"/)?.[1];
+    return {
+      configured: true,
+      tokenOk: false,
+      error: msg.slice(0, 280),
+      systemCode,
+    };
+  }
+}
+
 function tbcLanguage(lang?: string | null): "EN" | "KA" {
   return lang === "ka" ? "KA" : "EN";
 }
@@ -58,6 +85,9 @@ export async function getTbcAccessToken(env: Env): Promise<string> {
 
   if (!res.ok) {
     const text = await res.text();
+    if (res.status === 400 || res.status === 401) {
+      await env.KV.delete(TOKEN_CACHE_KEY);
+    }
     throw new Error(`TBC access-token ${res.status}: ${text.slice(0, 300)}`);
   }
 

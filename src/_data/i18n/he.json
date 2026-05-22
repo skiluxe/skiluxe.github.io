@@ -89,7 +89,7 @@
   },
   "booking": {
     "title": "הזמינו את השהייה",
-    "subtitle": "בחרו תאריכים ושלמו בצורה מאובטחת אונליין דרך TBC Bank.",
+    "subtitle": "בחרו תאריכים ושלמו בצורה מאובטחת אונליין דרך GeoPay.",
     "checkin": "צ׳ק‑אין",
     "checkout": "צ׳ק‑אאוט",
     "guests": "אורחים",
@@ -118,7 +118,7 @@
   },
   "payment": {
     "page_title": "סטטוס תשלום",
-    "page_subtitle": "מאשרים את התשלום מול TBC Bank.",
+    "page_subtitle": "מאשרים את התשלום מול GeoPay.",
     "checking": "בודקים סטטוס תשלום…",
     "success_title": "ההזמנה אושרה",
     "success_text": "התשלום התקבל. השהייה שלכם מאושרת. מספר: {ref}. שולם: {total}.",

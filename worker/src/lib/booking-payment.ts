@@ -1,5 +1,6 @@
 import type { Apartment, Booking, Env } from "../types";
 import { audit } from "./db";
+import { isGeopayUniqid } from "./geopay";
 import { getTbcPayment, isTbcPaymentFailed, isTbcPaymentSucceeded } from "./tbc-pay";
 import { bookingGuestEmail, bookingOwnerEmail, sendEmail, sendWhatsApp } from "./notify";
 import { signToken } from "./auth";
@@ -21,6 +22,15 @@ export async function syncBookingPayment(env: Env, bookingId: number): Promise<{
   }
   if (booking.payment_status === "succeeded" || booking.status === "confirmed") {
     return { booking, paymentStatus: "succeeded", changed: false };
+  }
+
+  // GeoPay: no status API — rely on callback or manual admin confirm
+  if (booking.tbc_pay_id && isGeopayUniqid(booking.tbc_pay_id)) {
+    return {
+      booking,
+      paymentStatus: booking.payment_status || "created",
+      changed: false,
+    };
   }
 
   const payment = await getTbcPayment(env, booking.tbc_pay_id);
@@ -82,6 +92,28 @@ export async function findBookingByPayId(env: Env, payId: string): Promise<Booki
   return (
     (await env.DB.prepare("SELECT * FROM bookings WHERE tbc_pay_id = ?").bind(payId).first<Booking>()) || null
   );
+}
+
+export async function markBookingPaid(env: Env, bookingId: number, payRef?: string): Promise<boolean> {
+  const booking = await env.DB.prepare("SELECT * FROM bookings WHERE id = ?")
+    .bind(bookingId)
+    .first<Booking>();
+  if (!booking || booking.status === "confirmed") return false;
+
+  const now = Date.now();
+  await env.DB.prepare(
+    `UPDATE bookings SET status = 'confirmed', payment_status = 'succeeded', paid_at = ?, confirmed_at = ? WHERE id = ?`
+  ).bind(now, now, bookingId).run();
+
+  try {
+    await audit(env.DB, "system", "booking.paid", "bookings", bookingId, { payRef: payRef || booking.tbc_pay_id });
+  } catch (e) {
+    console.error("audit booking.paid:", e);
+  }
+
+  const apt = await getApartmentById(env.DB, booking.apartment_id);
+  if (apt) await notifyBookingConfirmed(env, bookingId, apt, booking);
+  return true;
 }
 
 async function notifyBookingConfirmed(env: Env, bookingId: number, apt: Apartment, b: Booking) {

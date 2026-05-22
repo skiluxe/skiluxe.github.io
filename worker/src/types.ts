@@ -25,6 +25,19 @@ export interface Env {
   TBC_CLIENT_ID?: string;
   /** TBC Checkout merchant client_secret. */
   TBC_CLIENT_SECRET?: string;
+
+  /** GeoPay merchant ID (e.g. 1198). */
+  GEOPAY_MERCHANT_ID?: string;
+  /** GeoPay user ID (e.g. 1209). */
+  GEOPAY_USER_ID?: string;
+  /** GeoPay MD5 hash secret — request from GeoPay support. */
+  GEOPAY_HASH_SECRET?: string;
+  /** Hash formula: v1 (default) or v2. */
+  GEOPAY_HASH_MODE?: string;
+  /** Payment operation code (default v). */
+  GEOPAY_OP?: string;
+  /** Override redirect URL base. */
+  GEOPAY_REDIRECT_BASE?: string;
 }
 
 export interface Apartment {

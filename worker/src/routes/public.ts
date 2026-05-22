@@ -16,6 +16,7 @@ import { quote as buildQuote, nightsBetween, ymd } from "../lib/pricing";
 import { BookingInput, QuoteInput } from "../lib/validate";
 import { bookingGuestEmail, bookingOwnerEmail, sendEmail, sendWhatsApp } from "../lib/notify";
 import { signToken } from "../lib/auth";
+import { isGeopayConfigured, buildGeopayPaymentUrl } from "../lib/geopay";
 import { isTbcConfigured, createTbcPayment, tbcApprovalUrl } from "../lib/tbc-pay";
 
 export const publicRoutes = new Hono<{ Bindings: Env }>();
@@ -182,6 +183,41 @@ publicRoutes.post("/bookings", async (c) => {
 
   const reference = `SL-${String(bookingId).padStart(5, "0")}`;
 
+  // Online payment via GeoPay (preferred when configured)
+  if (isGeopayConfigured(c.env)) {
+    try {
+      const { url, uniqid } = buildGeopayPaymentUrl(c.env, {
+        bookingId,
+        amountMinor: q.total,
+        guestName: guest.name,
+        guestEmail: guest.email,
+        lang: guest.lang,
+        description: reference,
+      });
+      await c.env.DB.prepare(
+        "UPDATE bookings SET tbc_pay_id = ?, payment_status = 'created' WHERE id = ?"
+      ).bind(uniqid, bookingId).run();
+
+      return c.json({
+        booking_id: bookingId,
+        reference,
+        status: "pending",
+        hold_expires_at: holdExpires,
+        total: q.total,
+        currency: q.currency,
+        payment_url: url,
+        payment_required: true,
+        payment_provider: "geopay",
+      }, 201);
+    } catch (e) {
+      console.error("GeoPay payment init failed:", e);
+      await c.env.DB.prepare("UPDATE bookings SET status = 'cancelled', cancelled_at = ? WHERE id = ?")
+        .bind(Date.now(), bookingId)
+        .run();
+      return c.json({ error: "payment_init_failed" }, 502);
+    }
+  }
+
   // Online payment via TBC Checkout when merchant credentials are configured
   if (isTbcConfigured(c.env)) {
     try {
@@ -217,11 +253,15 @@ publicRoutes.post("/bookings", async (c) => {
         payment_required: true,
       }, 201);
     } catch (e) {
+      const msg = String((e as Error)?.message || e);
       console.error("TBC payment init failed:", e);
       await c.env.DB.prepare("UPDATE bookings SET status = 'cancelled', cancelled_at = ? WHERE id = ?")
         .bind(Date.now(), bookingId)
         .run();
-      return c.json({ error: "payment_init_failed" }, 502);
+      const isAuth = msg.includes("access-token");
+      return c.json({
+        error: isAuth ? "payment_auth_failed" : "payment_init_failed",
+      }, 502);
     }
   }
 

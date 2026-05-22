@@ -8,6 +8,8 @@ import { paymentRoutes } from "./routes/payments";
 import { syncAllSources } from "./jobs/sync-ical";
 import { expireHolds } from "./jobs/expire-holds";
 import { isPasswordHashFormat } from "./lib/auth";
+import { testTbcCredentials } from "./lib/tbc-pay";
+import { testGeopayCredentials } from "./lib/geopay";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -36,6 +38,16 @@ app.get("/health/admin-auth", async (c) => {
     storedLength: raw.length,
     encoding: raw.startsWith("pbkdf2$") ? "raw" : "base64",
   });
+});
+
+app.get("/health/geopay", async (c) => {
+  const result = await testGeopayCredentials(c.env);
+  return c.json(result, result.redirectOk ? 200 : 503);
+});
+
+app.get("/health/tbc", async (c) => {
+  const result = await testTbcCredentials(c.env);
+  return c.json(result, result.tokenOk ? 200 : 503);
 });
 
 app.route("/api", publicRoutes);

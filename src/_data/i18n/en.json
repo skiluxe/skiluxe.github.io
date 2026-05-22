@@ -89,7 +89,7 @@
   },
   "booking": {
     "title": "Reserve your stay",
-    "subtitle": "Select your dates and pay securely online with TBC Bank.",
+    "subtitle": "Select your dates and pay securely online with GeoPay.",
     "checkin": "Check in",
     "checkout": "Check out",
     "guests": "Guests",
@@ -120,7 +120,7 @@
   },
   "payment": {
     "page_title": "Payment status",
-    "page_subtitle": "We're confirming your payment with TBC Bank.",
+    "page_subtitle": "We're confirming your payment with GeoPay.",
     "checking": "Checking payment status…",
     "success_title": "Booking confirmed",
     "success_text": "Payment received. Your stay is confirmed. Reference: {ref}. Total paid: {total}.",

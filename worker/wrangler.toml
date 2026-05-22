@@ -39,3 +39,6 @@ crons = ["*/15 * * * *", "*/5 * * * *"]
 # TBC_API_KEY           Developer app API key from developers.tbcbank.ge
 # TBC_CLIENT_ID         Merchant client_id from ecom.tbcpayments.ge
 # TBC_CLIENT_SECRET     Merchant client_secret from ecom.tbcpayments.ge
+# GEOPAY_MERCHANT_ID    From GeoPay merchant panel (e.g. 1198)
+# GEOPAY_USER_ID        From GeoPay merchant panel (e.g. 1209)
+# GEOPAY_HASH_SECRET    MD5 hash key — request from GeoPay (+995 32 248 70 90)

@@ -12,7 +12,14 @@ MAIL_DKIM_SELECTOR = ""
 MAIL_DKIM_PRIVATE_KEY = ""
 MAILCHANNELS_API_KEY = ""
 
-# TBC E-Commerce (optional — enables online card payment at booking)
+# TBC E-Commerce (optional — legacy; GeoPay preferred)
 TBC_API_KEY = ""
 TBC_CLIENT_ID = ""
 TBC_CLIENT_SECRET = ""
+
+# GeoPay / UFC redirect payments (recommended)
+GEOPAY_MERCHANT_ID = "1198"
+GEOPAY_USER_ID = "1209"
+GEOPAY_HASH_SECRET = ""
+# GEOPAY_HASH_MODE = "v1"
+# GEOPAY_OP = "v"

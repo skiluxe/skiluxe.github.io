@@ -147,16 +147,49 @@ After a test booking, check logs if mail fails:
 cd worker && npx wrangler tail
 ```
 
-## 8. TBC E-Commerce online payments (optional)
+## 8. GeoPay online payments (recommended)
 
-Booking uses [TBC Checkout](https://developers.tbcbank.ge/docs/checkout-create-checkout-payment) when three secrets are set. Without them, the site keeps the offline 24h hold flow.
+Booking redirects to [GeoPay](https://geopay.ge/) / UFC card checkout when three secrets are set. This matches the payment links you already generate in your GeoPay merchant account (`merchant_id=1198`).
 
-You need **two** credential sets:
+Set secrets:
 
-1. **Developer app** — [developers.tbcbank.ge](https://developers.tbcbank.ge/docs/get-apikey-and-secret): register an app and copy the **API key** (sent as the `apikey` header on every request).
-2. **Merchant account** — register at [ecom.tbcpayments.ge](https://ecom.tbcpayments.ge/), wait for activation, then copy **client_id** and **client_secret** from the merchant dashboard.
+```bash
+cd worker
+wrangler secret put GEOPAY_MERCHANT_ID   # 1198
+wrangler secret put GEOPAY_USER_ID       # 1209
+wrangler secret put GEOPAY_HASH_SECRET   # MD5 hash key — email info@geopay.ge or call +995 32 248 70 90
+wrangler deploy
+```
 
-Apply the DB migration (adds payment columns):
+Verify:
+
+```bash
+curl https://api.new-gudauri.com/health/geopay
+```
+
+You need `"redirectOk": true`. If hash is wrong, GeoPay will reject payments — ask them for the exact **hash secret** and formula.
+
+In the GeoPay merchant panel, set the **return / callback URL** to:
+
+```
+https://api.new-gudauri.com/api/payments/geopay/callback
+```
+
+Also set the customer **return URL** after payment to your site, e.g.:
+
+```
+https://new-gudauri.com/en/booking/payment/
+```
+
+(query params `id` and `token` are appended automatically when the guest returns from checkout)
+
+**Flow:** guest submits booking → redirect to `payment.geopaysoft.com` → UFC card page → return to your site. If GeoPay sends a success callback, the booking is auto-confirmed.
+
+**Note:** GeoPay takes priority over TBC if both are configured. Remove TBC secrets if you only use GeoPay.
+
+## 8b. TBC E-Commerce (alternative)
+
+Booking uses [TBC Checkout](https://developers.tbcbank.ge/docs/checkout-create-checkout-payment) when GeoPay is **not** configured and three TBC secrets are set.
 
 ```bash
 cd worker
