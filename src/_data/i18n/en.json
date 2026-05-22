@@ -139,6 +139,20 @@
     "back_apartments": "Back to apartments",
     "try_again": "Try again"
   },
+  "hold": {
+    "page_title": "Your booking hold",
+    "page_subtitle": "We've reserved these dates for 24 hours while payment is arranged.",
+    "checking": "Loading your booking…",
+    "pending_title": "Dates on hold",
+    "pending_text": "Reference {ref}. {apartment}: {checkin} → {checkout}. Total: {total}. Hold expires {expires}. We'll contact you shortly to confirm payment.",
+    "confirmed_title": "Booking confirmed",
+    "confirmed_text": "Your stay is confirmed. Reference: {ref}. {apartment}: {checkin} → {checkout}. Total: {total}.",
+    "cancelled_title": "Hold expired or cancelled",
+    "cancelled_text": "This hold is no longer active (reference {ref}). Please book again or contact us on WhatsApp.",
+    "invalid_link": "This link is invalid or has expired.",
+    "back_apartments": "Browse apartments",
+    "contact_whatsapp": "WhatsApp us"
+  },
   "availability": {
     "title": "Availability",
     "available": "Available",

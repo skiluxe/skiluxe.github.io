@@ -267,11 +267,18 @@ publicRoutes.get("/bookings/:id", async (c) => {
   const { verifyToken } = await import("../lib/auth");
   const ok = await verifyToken(c.env, `booking:${id}`, token);
   if (!ok) return c.json({ error: "invalid_token" }, 403);
-  const b = await c.env.DB.prepare("SELECT * FROM bookings WHERE id = ?").bind(id).first<Booking>();
+  const b = await c.env.DB.prepare(
+    `SELECT b.*, a.slug AS apartment_slug, a.unit_label AS apartment_label
+     FROM bookings b
+     JOIN apartments a ON a.id = b.apartment_id
+     WHERE b.id = ?`
+  ).bind(id).first<Booking & { apartment_slug: string; apartment_label: string }>();
   if (!b) return c.json({ error: "not_found" }, 404);
   return c.json({
     id: b.id,
-    apartment_id: b.apartment_id,
+    reference: `SL-${String(b.id).padStart(5, "0")}`,
+    apartment_slug: b.apartment_slug,
+    apartment_label: b.apartment_label,
     checkin: b.checkin,
     checkout: b.checkout,
     status: b.status,

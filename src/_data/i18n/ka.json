@@ -137,6 +137,20 @@
     "back_apartments": "აპარტამენტებზე დაბრუნება",
     "try_again": "თავიდან ცდა"
   },
+  "hold": {
+    "page_title": "თქვენი ჯავშანი",
+    "page_subtitle": "ამ თარიღებს 24 საათით დავიკავეთ, სანამ გადახდას დავადასტურებთ.",
+    "checking": "ვტვირთავთ ჯავშანს…",
+    "pending_title": "თარიღები დაკავებულია",
+    "pending_text": "ნომერი {ref}. {apartment}: {checkin} → {checkout}. სულ: {total}. დაკავება მოქმედებს {expires}-მდე. მალე დაგიკავშირდებით გადახდის დასადასტურებლად.",
+    "confirmed_title": "ჯავშანი დადასტურებულია",
+    "confirmed_text": "თქვენი ვიზიტი დადასტურებულია. ნომერი: {ref}. {apartment}: {checkin} → {checkout}. სულ: {total}.",
+    "cancelled_title": "დაკავება ვადაგასულია ან გაუქმებულია",
+    "cancelled_text": "ეს დაკავება აღარ არის აქტიური (ნომერი {ref}). დაჯავშნეთ თავიდან ან მოგვწერეთ WhatsApp-ში.",
+    "invalid_link": "ბმული არასწორია ან ვადაგასულია.",
+    "back_apartments": "აპარტამენტებზე დაბრუნება",
+    "contact_whatsapp": "WhatsApp"
+  },
   "availability": {
     "title": "თავისუფლება",
     "available": "თავისუფალია",

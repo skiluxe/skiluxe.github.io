@@ -1,0 +1,41 @@
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">{{ i18n[lang].booking.title }}</p>
+    <h1 class="display">{{ i18n[lang].hold.page_title }}</h1>
+    <p class="lead">{{ i18n[lang].hold.page_subtitle }}</p>
+  </div>
+</section>
+
+<section class="container section">
+  <div class="booking-payment" id="booking-status">
+    <div class="booking-payment__loading">
+      <p>{{ i18n[lang].hold.checking }}</p>
+    </div>
+    <div class="booking-payment__pending" hidden>
+      <h2>{{ i18n[lang].hold.pending_title }}</h2>
+      <p class="booking-payment__text"></p>
+      <a class="btn btn--ghost" href="https://wa.me/{{ site.whatsapp | replace('+', '') | replace(' ', '') }}">{{ i18n[lang].hold.contact_whatsapp }}</a>
+    </div>
+    <div class="booking-payment__success" hidden>
+      <h2>{{ i18n[lang].hold.confirmed_title }}</h2>
+      <p class="booking-payment__text"></p>
+      <a class="btn btn--primary" href="/{{ lang }}/apartments/">{{ i18n[lang].hold.back_apartments }}</a>
+    </div>
+    <div class="booking-payment__failed" hidden>
+      <h2>{{ i18n[lang].hold.cancelled_title }}</h2>
+      <p class="booking-payment__text"></p>
+      <a class="btn btn--primary" href="/{{ lang }}/apartments/">{{ i18n[lang].hold.back_apartments }}</a>
+    </div>
+    <div class="booking-payment__error" role="alert" hidden></div>
+  </div>
+</section>
+
+<script>
+  window.SKILUXE_HOLD_I18N = {
+    pending_text: {{ i18n[lang].hold.pending_text | dump | safe }},
+    confirmed_text: {{ i18n[lang].hold.confirmed_text | dump | safe }},
+    cancelled_text: {{ i18n[lang].hold.cancelled_text | dump | safe }},
+    invalid_link: {{ i18n[lang].hold.invalid_link | dump | safe }},
+    error_generic: {{ i18n[lang].booking.error_generic | dump | safe }}
+  };
+</script>

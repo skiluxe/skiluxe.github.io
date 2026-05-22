@@ -137,6 +137,20 @@
     "back_apartments": "חזרה לדירות",
     "try_again": "נסו שוב"
   },
+  "hold": {
+    "page_title": "ההזמנה שלכם",
+    "page_subtitle": "שמרנו את התאריכים ל‑24 שעות בזמן שמתאמים את התשלום.",
+    "checking": "טוענים את ההזמנה…",
+    "pending_title": "התאריכים שמורים",
+    "pending_text": "מספר {ref}. {apartment}: {checkin} → {checkout}. סך הכל: {total}. השמירה בתוקף עד {expires}. ניצור קשר בקרוב לאישור התשלום.",
+    "confirmed_title": "ההזמנה אושרה",
+    "confirmed_text": "השהייה שלכם מאושרת. מספר: {ref}. {apartment}: {checkin} → {checkout}. סך הכל: {total}.",
+    "cancelled_title": "השמירה פגה או בוטלה",
+    "cancelled_text": "השמירה הזו כבר לא פעילה (מספר {ref}). הזמינו שוב או כתבו לנו ב‑WhatsApp.",
+    "invalid_link": "הקישור לא תקין או שפג תוקפו.",
+    "back_apartments": "חזרה לדירות",
+    "contact_whatsapp": "WhatsApp"
+  },
   "availability": {
     "title": "זמינות",
     "available": "פנוי",

@@ -137,6 +137,20 @@
     "back_apartments": "К апартаментам",
     "try_again": "Попробовать снова"
   },
+  "hold": {
+    "page_title": "Ваше бронирование",
+    "page_subtitle": "Мы зарезервировали эти даты на 24 часа, пока согласовывается оплата.",
+    "checking": "Загружаем бронирование…",
+    "pending_title": "Даты на удержании",
+    "pending_text": "Номер {ref}. {apartment}: {checkin} → {checkout}. Итого: {total}. Удержание до {expires}. Мы скоро свяжемся с вами для подтверждения оплаты.",
+    "confirmed_title": "Бронирование подтверждено",
+    "confirmed_text": "Ваше бронирование подтверждено. Номер: {ref}. {apartment}: {checkin} → {checkout}. Итого: {total}.",
+    "cancelled_title": "Удержание истекло или отменено",
+    "cancelled_text": "Это удержание больше не активно (номер {ref}). Забронируйте снова или напишите нам в WhatsApp.",
+    "invalid_link": "Ссылка недействительна или устарела.",
+    "back_apartments": "К апартаментам",
+    "contact_whatsapp": "WhatsApp"
+  },
   "availability": {
     "title": "Доступность",
     "available": "Свободно",
