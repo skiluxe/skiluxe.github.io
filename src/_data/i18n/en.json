@@ -11,6 +11,7 @@
     "home": "Home",
     "apartments": "Apartments",
     "about": "About",
+    "live_camera": "Live Camera",
     "contact": "Contact",
     "book": "Book"
   },
@@ -170,6 +171,24 @@
     "p3": "We host skiers, snowboarders, ski-tourers, and the occasional summer mountain runner. We don't host stag weekends.",
     "where_title": "Where we are",
     "where_text": "New Gudauri sits at 2,200m in the Caucasus, on the Georgian Military Road two hours north of Tbilisi. The resort tops out above 3,300m with 70+ km of marked runs and some of the most accessible off-piste in Europe."
+  },
+  "live_camera": {
+    "title": "Live from Gudauri",
+    "subtitle": "Watch the slopes in real time from New Gudauri.",
+    "stream_title": "YouTube Live",
+    "stream_note": "When we're not streaming, use the Reolink instructions below to view the camera directly.",
+    "fallback_title": "If the Livestream Doesn't Work",
+    "step1_title": "Download the Reolink App",
+    "step1_text": "Available on both the App Store and Google Play Store.",
+    "step2_title": "Add Your Camera",
+    "step2_text": "Open the app and tap the + or Add Camera button.",
+    "step3_title": "Scan the QR Code",
+    "step3_text": "Use the camera on your device to scan the QR code below:",
+    "step4_title": "Log In",
+    "step4_text": "Enter the following credentials:",
+    "username": "Username",
+    "password": "Password",
+    "qr_alt": "Reolink camera QR code for Gudauri live view"
   },
   "contact": {
     "title": "Get in touch",

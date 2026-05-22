@@ -11,6 +11,8 @@ module.exports = {
   instagramUrl: "https://www.instagram.com/skiluxeng/",
   telegram: "SkiluxeBot",
   telegramUrl: "https://t.me/SkiluxeBot",
+  youtubeChannelId: "UCJymmFi70lS6q2ZwnsAGabw",
+  youtubeLiveUrl: "https://www.youtube.com/@gudauriflats/live",
   langs: [
     { code: "en", label: "English", dir: "ltr" },
     { code: "ru", label: "Русский", dir: "ltr" },

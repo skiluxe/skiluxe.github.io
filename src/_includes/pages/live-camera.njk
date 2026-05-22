@@ -1,0 +1,62 @@
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">{{ i18n[lang].nav.live_camera }}</p>
+    <h1 class="display">{{ i18n[lang].live_camera.title }}</h1>
+    <p class="lead">{{ i18n[lang].live_camera.subtitle }}</p>
+  </div>
+</section>
+
+<section class="container section live-camera">
+  <div class="live-camera__stream">
+    <h2 class="live-camera__heading">{{ i18n[lang].live_camera.stream_title }}</h2>
+    <div class="live-camera__embed">
+      <iframe
+        src="https://www.youtube.com/embed/live_stream?channel={{ site.youtubeChannelId }}"
+        title="{{ i18n[lang].live_camera.title }}"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        loading="lazy"
+      ></iframe>
+    </div>
+    <p class="live-camera__stream-note">{{ i18n[lang].live_camera.stream_note }}</p>
+  </div>
+
+  <aside class="live-camera__fallback">
+    <h2 class="live-camera__heading">{{ i18n[lang].live_camera.fallback_title }}</h2>
+    <ol class="live-camera__steps">
+      <li>
+        <h3>{{ i18n[lang].live_camera.step1_title }}</h3>
+        <p>{{ i18n[lang].live_camera.step1_text }}</p>
+        <div class="live-camera__stores">
+          <a class="btn btn--ghost" href="https://apps.apple.com/app/reolink/id952366334" rel="noopener noreferrer">App Store</a>
+          <a class="btn btn--ghost" href="https://play.google.com/store/apps/details?id=com.mcu.reolink" rel="noopener noreferrer">Google Play</a>
+        </div>
+      </li>
+      <li>
+        <h3>{{ i18n[lang].live_camera.step2_title }}</h3>
+        <p>{{ i18n[lang].live_camera.step2_text }}</p>
+      </li>
+      <li>
+        <h3>{{ i18n[lang].live_camera.step3_title }}</h3>
+        <p>{{ i18n[lang].live_camera.step3_text }}</p>
+        <figure class="live-camera__qr">
+          <img src="/assets/img/gudauri-camera-qr.png" width="220" height="220" alt="{{ i18n[lang].live_camera.qr_alt }}">
+        </figure>
+      </li>
+      <li>
+        <h3>{{ i18n[lang].live_camera.step4_title }}</h3>
+        <p>{{ i18n[lang].live_camera.step4_text }}</p>
+        <dl class="live-camera__credentials">
+          <div>
+            <dt>{{ i18n[lang].live_camera.username }}</dt>
+            <dd><code>gudaurilive</code></dd>
+          </div>
+          <div>
+            <dt>{{ i18n[lang].live_camera.password }}</dt>
+            <dd><code>gudauri25</code></dd>
+          </div>
+        </dl>
+      </li>
+    </ol>
+  </aside>
+</section>
