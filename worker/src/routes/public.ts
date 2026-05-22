@@ -137,7 +137,7 @@ publicRoutes.post("/bookings", async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const parsed = BookingInput.safeParse(body);
   if (!parsed.success) return c.json({ error: "invalid_input", details: parsed.error.flatten() }, 400);
-  const { apartment_slug, checkin, checkout, guests_count, infants_count, non_refundable, guest } = parsed.data;
+  const { apartment_slug, checkin, checkout, guests_count, infants_count, non_refundable, payment_mode, guest } = parsed.data;
   if (nightsBetween(checkin, checkout) < 1) return c.json({ error: "min_stay" }, 400);
 
   const apt = await getApartmentBySlug(c.env.DB, apartment_slug);
@@ -191,8 +191,8 @@ publicRoutes.post("/bookings", async (c) => {
 
   const reference = `SL-${String(bookingId).padStart(5, "0")}`;
 
-  // Online payment via TBC Checkout when merchant credentials are configured
-  if (isTbcConfigured(c.env)) {
+  // Online payment via TBC Checkout when guest chose pay and merchant credentials are configured
+  if (payment_mode === "pay" && isTbcConfigured(c.env)) {
     try {
       const lookupToken = await signToken(c.env, `booking:${bookingId}`);
       const lang = guest.lang || "en";

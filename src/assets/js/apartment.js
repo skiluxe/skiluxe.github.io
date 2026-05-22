@@ -237,9 +237,13 @@ function initBooking() {
   const quoteLines = widget.querySelector(".booking__quote-lines");
   const quoteAmt = widget.querySelector(".booking__quote-amount");
   const hint = widget.querySelector(".booking__hint");
-  const submit = form.querySelector(".booking__submit");
-  const submitIdle = form.querySelector(".booking__submit-idle");
-  const submitBusy = form.querySelector(".booking__submit-busy");
+  const submitPay = form.querySelector(".booking__submit");
+  const submitHold = form.querySelector(".booking__submit-hold");
+  const submitButtons = [submitPay, submitHold].filter(Boolean);
+  const payIdle = submitPay?.querySelector(".booking__submit-idle");
+  const payBusy = submitPay?.querySelector(".booking__submit-busy");
+  const holdIdle = submitHold?.querySelector(".booking__hold-idle");
+  const holdBusy = submitHold?.querySelector(".booking__hold-busy");
   const successBox = widget.querySelector(".booking__success");
   const successText = widget.querySelector(".booking__success-text");
   const errorBox = widget.querySelector(".booking__error");
@@ -274,7 +278,25 @@ function initBooking() {
   let datesUnavailable = false;
 
   function setSubmitEnabled(enabled) {
-    submit.disabled = !enabled;
+    submitButtons.forEach((btn) => { btn.disabled = !enabled; });
+  }
+
+  function setSubmitting(activeMode) {
+    submitButtons.forEach((btn) => { btn.disabled = true; });
+    if (activeMode === "pay") {
+      if (payIdle) payIdle.hidden = true;
+      if (payBusy) payBusy.hidden = false;
+    } else if (activeMode === "hold") {
+      if (holdIdle) holdIdle.hidden = true;
+      if (holdBusy) holdBusy.hidden = false;
+    }
+  }
+
+  function resetSubmitting() {
+    if (payIdle) payIdle.hidden = false;
+    if (payBusy) payBusy.hidden = true;
+    if (holdIdle) holdIdle.hidden = false;
+    if (holdBusy) holdBusy.hidden = true;
   }
 
   async function refreshQuote() {
@@ -402,8 +424,7 @@ function initBooking() {
   syncCheckoutFromCheckin();
   refreshQuote();
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  async function submitBooking(paymentMode) {
     showError("");
     if (datesUnavailable) {
       showError(STR.unavailable || "Dates no longer available. Please pick different dates.");
@@ -420,9 +441,7 @@ function initBooking() {
     }
     if (!apiBase) { showError("Booking API not configured yet."); return; }
 
-    submit.disabled = true;
-    submitIdle.hidden = true;
-    submitBusy.hidden = false;
+    setSubmitting(paymentMode);
     try {
       const res = await fetch(`${apiBase}/api/bookings`, {
         method: "POST",
@@ -434,6 +453,7 @@ function initBooking() {
           guests_count: g,
           infants_count: infantCount,
           non_refundable: !!fd.get("non_refundable"),
+          payment_mode: paymentMode,
           guest: {
             name: String(fd.get("name") || ""),
             email: String(fd.get("email") || ""),
@@ -468,7 +488,7 @@ function initBooking() {
         successText.textContent = (STR.redirecting_payment || "Redirecting to secure payment…").replace("{ref}", ref);
         successBox.hidden = false;
         form.querySelectorAll("input, select, textarea, button").forEach((el) => { el.disabled = true; });
-        submit.hidden = true;
+        submitButtons.forEach((btn) => { btn.hidden = true; });
         subtitle.hidden = true;
         guestSection.hidden = true;
         quoteBox.hidden = true;
@@ -479,8 +499,8 @@ function initBooking() {
 
       successText.textContent = (STR.success_text || "Dates held. Reference: {ref}.").replace("{ref}", ref);
       successBox.hidden = false;
-      form.querySelectorAll("input, select, textarea, button").forEach((el) => { if (el.type !== "submit") el.disabled = true; });
-      submit.hidden = true;
+      form.querySelectorAll("input, select, textarea, button").forEach((el) => { el.disabled = true; });
+      submitButtons.forEach((btn) => { btn.hidden = true; });
       subtitle.hidden = true;
       guestSection.hidden = true;
       quoteBox.hidden = true;
@@ -488,10 +508,16 @@ function initBooking() {
     } catch (err) {
       showError(STR.error_generic || "Something went wrong. Please try again or message us on WhatsApp.");
     } finally {
-      if (!datesUnavailable && !submit.hidden) submit.disabled = false;
-      submitIdle.hidden = false;
-      submitBusy.hidden = true;
+      resetSubmitting();
+      if (!datesUnavailable && submitButtons.some((btn) => !btn.hidden)) setSubmitEnabled(true);
     }
+  }
+
+  submitPay?.addEventListener("click", () => submitBooking("pay"));
+  submitHold?.addEventListener("click", () => submitBooking("hold"));
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
   });
 }
 

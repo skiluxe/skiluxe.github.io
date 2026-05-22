@@ -21,6 +21,8 @@ export const BookingInput = z.object({
   guests_count: z.number().int().positive().max(20),
   infants_count: z.number().int().min(0).max(10).optional().default(0),
   non_refundable: z.boolean().optional().default(false),
+  /** "pay" tries online checkout; "hold" creates a 24h pending hold with email notifications. */
+  payment_mode: z.enum(["pay", "hold"]).optional().default("pay"),
   guest: z.object({
     name: z.string().min(2).max(120),
     email: z.string().email().max(180),

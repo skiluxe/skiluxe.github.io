@@ -155,6 +155,7 @@
   padding: 28px;
   box-shadow: var(--shadow-sm), 0 0 0 1px rgba(201, 168, 76, 0.06);
 }
+.booking:hover {
   box-shadow: var(--shadow-md);
 }
 .booking__head { padding-block-end: 16px; border-block-end: 1px solid var(--line); margin-block-end: 20px; }
@@ -237,7 +238,13 @@
 .booking__nr-text strong { font-size: 0.92rem; color: var(--ink); text-transform: none; letter-spacing: 0; }
 .booking__nr-text small { color: var(--muted); font-size: 0.8rem; }
 
-.booking__submit { width: 100%; margin-block-start: 8px; }
+.booking__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-block-start: 8px;
+}
+.booking__actions .btn { width: 100%; }
 
 .booking__success {
   padding: 18px;

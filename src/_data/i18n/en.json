@@ -89,7 +89,7 @@
   },
   "booking": {
     "title": "Reserve your stay",
-    "subtitle": "Select your dates and pay securely online with TBC Bank.",
+    "subtitle": "Pay online with TBC Bank, or hold the dates for 24 hours while we confirm your stay.",
     "checkin": "Check in",
     "checkout": "Check out",
     "guests": "Guests (age 3+)",
@@ -113,6 +113,8 @@
     "notes": "Notes (optional)",
     "submit": "Book & pay online",
     "submitting": "Redirecting to payment…",
+    "submit_hold": "Hold dates for 24 hours",
+    "submitting_hold": "Placing hold…",
     "success_title": "Dates held",
     "success_text": "We've put a 24h hold on these dates and notified the owner. You'll hear back shortly to confirm payment details. Booking reference: {ref}.",
     "redirecting_payment": "Redirecting to secure payment. Reference: {ref}.",
