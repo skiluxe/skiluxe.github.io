@@ -36,3 +36,6 @@ crons = ["*/15 * * * *", "*/5 * * * *"]
 # MAIL_DKIM_SELECTOR    mailchannels
 # MAIL_DKIM_PRIVATE_KEY base64 of DKIM private key (PKCS8)
 # MAILCHANNELS_API_KEY  from MailChannels Console → API keys
+# TBC_API_KEY           Developer app API key from developers.tbcbank.ge
+# TBC_CLIENT_ID         Merchant client_id from ecom.tbcpayments.ge
+# TBC_CLIENT_SECRET     Merchant client_secret from ecom.tbcpayments.ge

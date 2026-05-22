@@ -33,7 +33,7 @@
           <p class="apartment-card__summary">{{ i18n[lang] | tpath(apt.summary_key) }}</p>
           <p class="apartment-card__price">
             <span>{{ i18n[lang].apartments.from }}</span>
-            <strong>{{ apt.base_rate_usd | currency("USD") }}</strong>
+            <strong>{{ apt.base_rate | currency(site.currency) }}</strong>
             <span>{{ i18n[lang].apartments.per_night }}</span>
           </p>
           <span class="apartment-card__cta">{{ i18n[lang].apartments.view_details }} →</span>

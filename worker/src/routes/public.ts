@@ -16,6 +16,7 @@ import { quote as buildQuote, nightsBetween, ymd } from "../lib/pricing";
 import { BookingInput, QuoteInput } from "../lib/validate";
 import { bookingGuestEmail, bookingOwnerEmail, sendEmail, sendWhatsApp } from "../lib/notify";
 import { signToken } from "../lib/auth";
+import { isTbcConfigured, createTbcPayment, tbcApprovalUrl } from "../lib/tbc-pay";
 
 export const publicRoutes = new Hono<{ Bindings: Env }>();
 
@@ -179,6 +180,52 @@ publicRoutes.post("/bookings", async (c) => {
     console.error("audit booking.create:", e);
   }
 
+  const reference = `SL-${String(bookingId).padStart(5, "0")}`;
+
+  // Online payment via TBC Checkout when merchant credentials are configured
+  if (isTbcConfigured(c.env)) {
+    try {
+      const lookupToken = await signToken(c.env, `booking:${bookingId}`);
+      const lang = guest.lang || "en";
+      const returnUrl = `${c.env.SITE_ORIGIN}/${lang}/booking/payment/?id=${bookingId}&token=${lookupToken}`;
+      const callbackUrl = `${new URL(c.req.url).origin}/api/payments/tbc/callback`;
+      const payment = await createTbcPayment(c.env, {
+        amountMinor: q.total,
+        currency: q.currency,
+        merchantPaymentId: reference,
+        description: `SkiLuxe ${reference}`,
+        returnUrl,
+        callbackUrl,
+        userIp: ip !== "unknown" ? ip : undefined,
+        lang,
+      });
+      const paymentUrl = tbcApprovalUrl(payment);
+      if (!paymentUrl) throw new Error("TBC payment missing approval_url");
+
+      await c.env.DB.prepare(
+        "UPDATE bookings SET tbc_pay_id = ?, payment_status = 'created' WHERE id = ?"
+      ).bind(payment.payId, bookingId).run();
+
+      return c.json({
+        booking_id: bookingId,
+        reference,
+        status: "pending",
+        hold_expires_at: holdExpires,
+        total: q.total,
+        currency: q.currency,
+        payment_url: paymentUrl,
+        payment_required: true,
+      }, 201);
+    } catch (e) {
+      console.error("TBC payment init failed:", e);
+      await c.env.DB.prepare("UPDATE bookings SET status = 'cancelled', cancelled_at = ? WHERE id = ?")
+        .bind(Date.now(), bookingId)
+        .run();
+      return c.json({ error: "payment_init_failed" }, 502);
+    }
+  }
+
+  // Offline hold flow (no TBC credentials)
   // Fire and forget notifications
   c.executionCtx.waitUntil(notifyOwnerAndGuest(c.env, bookingId, apt, {
     id: bookingId,
@@ -194,7 +241,6 @@ publicRoutes.post("/bookings", async (c) => {
     notes: guest.notes || null,
   }));
 
-  const reference = `SL-${String(bookingId).padStart(5, "0")}`;
   return c.json({
     booking_id: bookingId,
     reference,

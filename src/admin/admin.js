@@ -22,8 +22,8 @@ function el(tag, attrs = {}, children = []) {
 }
 
 function fmtMoney(cents, currency) {
-  try { return new Intl.NumberFormat("en-US", { style: "currency", currency: currency || "USD", maximumFractionDigits: 0 }).format((cents || 0) / 100); }
-  catch (_) { return "$" + Math.round((cents || 0) / 100); }
+  try { return new Intl.NumberFormat("ka-GE", { style: "currency", currency: currency || "GEL", maximumFractionDigits: 0 }).format((cents || 0) / 100); }
+  catch (_) { return "₾" + Math.round((cents || 0) / 100); }
 }
 function fmtDate(iso) {
   if (!iso) return "—";
@@ -349,7 +349,7 @@ async function renderPricing() {
         el("tbody", {}, overrides.overrides.map((o) => el("tr", {}, [
           el("td", {}, apts.apartments.find((a) => a.id === o.apartment_id)?.slug || o.apartment_id),
           el("td", {}, o.date),
-          el("td", {}, fmtMoney(o.rate, "USD")),
+          el("td", {}, fmtMoney(o.rate, apts.apartments.find((a) => a.id === o.apartment_id)?.currency || "GEL")),
           el("td", {}, o.note || ""),
           el("td", {}, el("button", { class: "btn btn--ghost btn--sm", onClick: async () => {
             await api(`/api/admin/date-overrides/${o.id}`, { method: "DELETE" });
@@ -408,12 +408,15 @@ function seasonForm(apartments) {
 }
 
 function seasonRow(s, apartments) {
+  const cur = s.apartment_id == null
+    ? "GEL"
+    : (apartments.find((a) => a.id === s.apartment_id)?.currency || "GEL");
   return el("tr", {}, [
     el("td", {}, s.apartment_id == null ? "All" : (apartments.find((a) => a.id === s.apartment_id)?.slug || s.apartment_id)),
     el("td", {}, s.name),
     el("td", {}, s.start_date),
     el("td", {}, s.end_date),
-    el("td", {}, s.override_rate ? `→ ${fmtMoney(s.override_rate, "USD")}` : `×${s.multiplier}`),
+    el("td", {}, s.override_rate ? `→ ${fmtMoney(s.override_rate, cur)}` : `×${s.multiplier}`),
     el("td", {}, String(s.priority)),
     el("td", {}, el("button", { class: "btn btn--ghost btn--sm", onClick: async () => {
       if (!confirm("Delete season?")) return;

@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS apartments (
   max_guests    INTEGER NOT NULL,
   area_sqm      INTEGER,
   base_rate     INTEGER NOT NULL,
-  currency      TEXT NOT NULL DEFAULT 'USD',
+  currency      TEXT NOT NULL DEFAULT 'GEL',
   amenities_json TEXT NOT NULL DEFAULT '[]',
   created_at    INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
 );

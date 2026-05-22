@@ -11,3 +11,8 @@ MAIL_DKIM_DOMAIN = ""
 MAIL_DKIM_SELECTOR = ""
 MAIL_DKIM_PRIVATE_KEY = ""
 MAILCHANNELS_API_KEY = ""
+
+# TBC E-Commerce (optional — enables online card payment at booking)
+TBC_API_KEY = ""
+TBC_CLIENT_ID = ""
+TBC_CLIENT_SECRET = ""

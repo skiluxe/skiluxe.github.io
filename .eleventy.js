@@ -10,14 +10,15 @@ module.exports = function (eleventyConfig) {
 
   eleventyConfig.addFilter("currency", (amount, code) => {
     const value = (amount || 0) / 100;
+    const cur = code || "GEL";
     try {
-      return new Intl.NumberFormat("en-US", {
+      return new Intl.NumberFormat("en-GE", {
         style: "currency",
-        currency: code || "USD",
+        currency: cur,
         maximumFractionDigits: 0,
       }).format(value);
     } catch (_) {
-      return `$${value.toFixed(0)}`;
+      return `₾${value.toFixed(0)}`;
     }
   });
 

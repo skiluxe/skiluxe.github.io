@@ -18,5 +18,6 @@ module.exports = {
     { code: "he", label: "עברית", dir: "rtl" },
   ],
   defaultLang: "en",
+  currency: "GEL",
   coords: { lat: 42.477, lng: 44.474 },
 };

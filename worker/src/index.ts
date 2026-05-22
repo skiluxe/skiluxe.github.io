@@ -4,6 +4,7 @@ import type { Env } from "./types";
 import { publicRoutes } from "./routes/public";
 import { adminRoutes } from "./routes/admin";
 import { icalRoutes } from "./routes/ical";
+import { paymentRoutes } from "./routes/payments";
 import { syncAllSources } from "./jobs/sync-ical";
 import { expireHolds } from "./jobs/expire-holds";
 import { isPasswordHashFormat } from "./lib/auth";
@@ -40,6 +41,7 @@ app.get("/health/admin-auth", async (c) => {
 app.route("/api", publicRoutes);
 app.route("/api/admin", adminRoutes);
 app.route("/api/ical", icalRoutes);
+app.route("/api/payments", paymentRoutes);
 
 app.notFound((c) => c.json({ error: "not_found" }, 404));
 app.onError((err, c) => {

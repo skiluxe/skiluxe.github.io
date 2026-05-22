@@ -147,7 +147,44 @@ After a test booking, check logs if mail fails:
 cd worker && npx wrangler tail
 ```
 
-## 8. Verify end-to-end
+## 8. TBC E-Commerce online payments (optional)
+
+Booking uses [TBC Checkout](https://developers.tbcbank.ge/docs/checkout-create-checkout-payment) when three secrets are set. Without them, the site keeps the offline 24h hold flow.
+
+You need **two** credential sets:
+
+1. **Developer app** — [developers.tbcbank.ge](https://developers.tbcbank.ge/docs/get-apikey-and-secret): register an app and copy the **API key** (sent as the `apikey` header on every request).
+2. **Merchant account** — register at [ecom.tbcpayments.ge](https://ecom.tbcpayments.ge/), wait for activation, then copy **client_id** and **client_secret** from the merchant dashboard.
+
+Apply the DB migration (adds payment columns):
+
+```bash
+cd worker
+wrangler d1 migrations apply skiluxe-db --remote
+```
+
+Set secrets:
+
+```bash
+wrangler secret put TBC_API_KEY
+wrangler secret put TBC_CLIENT_ID
+wrangler secret put TBC_CLIENT_SECRET
+wrangler deploy
+```
+
+In the TBC merchant dashboard, add a **callback URL**:
+
+```
+https://api.new-gudauri.com/api/payments/tbc/callback
+```
+
+TBC sends POST requests from IPs `193.104.20.44`, `193.104.20.45`, `185.52.80.44`, `185.52.80.45` — Cloudflare Workers accepts these by default.
+
+**Flow:** guest submits booking → redirected to TBC payment page → on success the callback auto-confirms the booking and sends owner/guest emails.
+
+**Currency:** apartments are priced in GEL (Georgian Lari). GEL is the default for TBC Checkout.
+
+## 9. Verify end-to-end
 
 1. Browse `https://www.new-gudauri.com/en/` → homepage loads, all 4 languages switch correctly, Hebrew flips to RTL.
 2. Open an apartment detail → availability calendar renders (Nov–Apr ski season, 3×2 grid).
@@ -156,7 +193,7 @@ cd worker && npx wrangler tail
 5. Subscribe `https://api.new-gudauri.com/api/ical/f2-one-bedroom.ics` from Google Calendar → confirmed dates show up.
 6. In `/admin/ical/`, paste your Booking.com iCal export URL for each apartment → "Sync now" → dates appear blocked.
 
-## 9. Wix cutover
+## 10. Wix cutover
 
 Once everything above checks out, change DNS at the registrar:
 
@@ -164,7 +201,7 @@ Once everything above checks out, change DNS at the registrar:
 2. Switch nameservers to Cloudflare (or update A/CNAME if you keep registrar DNS).
 3. Keep Wix paid for one billing cycle as a rollback option.
 
-## 10. Drop the real photos
+## 11. Drop the real photos
 
 Owner flow:
 

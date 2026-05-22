@@ -8,11 +8,11 @@ function fmtMoney(cents, currency) {
   try {
     return new Intl.NumberFormat(CFG.lang, {
       style: "currency",
-      currency: currency || "USD",
+      currency: currency || "GEL",
       maximumFractionDigits: 0,
     }).format((cents || 0) / 100);
   } catch (_) {
-    return "$" + Math.round((cents || 0) / 100);
+    return "₾" + Math.round((cents || 0) / 100);
   }
 }
 
@@ -306,7 +306,7 @@ function initBooking() {
       // Offline / static-only: show a rough estimate from base rate
       const nights = diffDays(ciD, coD);
       const base = parseInt(widget.dataset.base, 10);
-      const currency = widget.dataset.currency || "USD";
+      const currency = widget.dataset.currency || "GEL";
       quoteLines.innerHTML = `<li><span>${nights} × ${fmtMoney(base, currency)}</span><span>${fmtMoney(base * nights, currency)}</span></li>`;
       quoteAmt.textContent = fmtMoney(base * nights, currency);
       quoteBox.hidden = false;
@@ -348,7 +348,7 @@ function initBooking() {
   }
 
   function renderQuote(q) {
-    const cur = q.currency || "USD";
+    const cur = q.currency || "GEL";
     const nightsCount = (q.nights || []).length;
     const nightlyAvg = nightsCount ? Math.round(q.subtotal / nightsCount) : 0;
     const lines = [];
@@ -428,10 +428,28 @@ function initBooking() {
       if (!res.ok) {
         let detail = "";
         try { const j = await res.json(); detail = j.error || ""; } catch (_) {}
+        if (detail === "payment_init_failed") {
+          showError(STR.payment_failed || "Could not start payment. Please try again or contact us on WhatsApp.");
+          return;
+        }
         throw new Error(detail || `booking failed ${res.status}`);
       }
       const data = await res.json();
       const ref = data.reference || data.booking_id || "—";
+
+      if (data.payment_url) {
+        successText.textContent = (STR.redirecting_payment || "Redirecting to secure payment…").replace("{ref}", ref);
+        successBox.hidden = false;
+        form.querySelectorAll("input, select, textarea, button").forEach((el) => { el.disabled = true; });
+        submit.hidden = true;
+        subtitle.hidden = true;
+        guestSection.hidden = true;
+        quoteBox.hidden = true;
+        hint.hidden = true;
+        window.location.href = data.payment_url;
+        return;
+      }
+
       successText.textContent = (STR.success_text || "Dates held. Reference: {ref}.").replace("{ref}", ref);
       successBox.hidden = false;
       form.querySelectorAll("input, select, textarea, button").forEach((el) => { if (el.type !== "submit") el.disabled = true; });

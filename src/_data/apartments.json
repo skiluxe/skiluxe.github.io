@@ -12,7 +12,7 @@
     "floor": 4,
     "view": "mountain",
     "ski_access": "ski-in/ski-out",
-    "base_rate_usd": 18000,
+    "base_rate": 49500,
     "amenities": [
       "wifi", "kitchen", "balcony", "heating", "tv",
       "washer", "ski_storage", "parking", "mountain_view",
@@ -33,7 +33,7 @@
     "floor": 3,
     "view": "mountain",
     "ski_access": "ski-in/ski-out",
-    "base_rate_usd": 14000,
+    "base_rate": 38500,
     "amenities": [
       "wifi", "kitchen", "heating", "tv",
       "ski_storage", "parking", "mountain_view",
@@ -54,7 +54,7 @@
     "floor": 5,
     "view": "mountain",
     "ski_access": "100m to gondola",
-    "base_rate_usd": 15000,
+    "base_rate": 41000,
     "amenities": [
       "wifi", "kitchen", "heating", "tv",
       "washer", "ski_storage", "mountain_view",
@@ -75,7 +75,7 @@
     "floor": 3,
     "view": "valley",
     "ski_access": "100m to gondola",
-    "base_rate_usd": 12000,
+    "base_rate": 33000,
     "amenities": [
       "wifi", "kitchen", "balcony", "heating", "tv",
       "ski_storage", "mountain_view",

@@ -1,8 +1,8 @@
-<aside class="booking" data-slug="{{ apartment.slug }}" data-max-guests="{{ apartment.max_guests }}" data-base="{{ apartment.base_rate_usd }}" data-currency="USD" data-lang="{{ lang }}">
+<aside class="booking" data-slug="{{ apartment.slug }}" data-max-guests="{{ apartment.max_guests }}" data-base="{{ apartment.base_rate }}" data-currency="{{ site.currency }}" data-lang="{{ lang }}">
   <header class="booking__head">
     <div class="booking__price">
       <span class="booking__from">{{ i18n[lang].apartments.from }}</span>
-      <span class="booking__amount">{{ apartment.base_rate_usd | currency("USD") }}</span>
+      <span class="booking__amount">{{ apartment.base_rate | currency(site.currency) }}</span>
       <span class="booking__per">{{ i18n[lang].apartments.per_night }}</span>
     </div>
   </header>
