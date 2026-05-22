@@ -16,7 +16,7 @@
     "amenities": [
       "wifi", "kitchen", "balcony", "heating", "tv",
       "washer", "ski_storage", "parking", "mountain_view",
-      "coffee_machine", "linens", "towels"
+      "linens", "towels"
     ],
     "featured": true
   },
@@ -37,7 +37,7 @@
     "amenities": [
       "wifi", "kitchen", "heating", "tv",
       "ski_storage", "parking", "mountain_view",
-      "coffee_machine", "linens", "towels"
+      "linens", "towels"
     ],
     "featured": true
   },
@@ -58,7 +58,7 @@
     "amenities": [
       "wifi", "kitchen", "heating", "tv",
       "washer", "ski_storage", "mountain_view",
-      "coffee_machine", "linens", "towels", "sofa_bed"
+      "linens", "towels", "sofa_bed"
     ],
     "featured": true
   },
@@ -79,7 +79,7 @@
     "amenities": [
       "wifi", "kitchen", "balcony", "heating", "tv",
       "ski_storage", "mountain_view",
-      "coffee_machine", "linens", "towels"
+      "linens", "towels"
     ],
     "featured": false
   }
