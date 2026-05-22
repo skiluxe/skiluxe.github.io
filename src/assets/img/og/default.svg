@@ -1,14 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0E223A"/>
-      <stop offset="0.6" stop-color="#2A4868"/>
-      <stop offset="1" stop-color="#A87248" stop-opacity="0.5"/>
+      <stop offset="0" stop-color="#0A0F18"/>
+      <stop offset="0.55" stop-color="#121A28"/>
+      <stop offset="1" stop-color="#6B5416" stop-opacity="0.55"/>
     </linearGradient>
+    <linearGradient id="gold" x1="600" y1="120" x2="600" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F5E6B8"/>
+      <stop offset="0.5" stop-color="#D4AF37"/>
+      <stop offset="1" stop-color="#8B6914"/>
+    </linearGradient>
+    <radialGradient id="eye" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#D8F4FF"/>
+      <stop offset="1" stop-color="#5EB8DC"/>
+    </radialGradient>
   </defs>
   <rect width="1200" height="630" fill="url(#sky)"/>
-  <polygon points="0,630 160,400 320,490 460,330 620,460 800,360 980,490 1200,420 1200,630" fill="#0c1c30" opacity="0.9"/>
-  <polygon points="0,630 140,500 320,560 480,470 640,540 820,490 1000,560 1200,520 1200,630" fill="#06101c"/>
-  <text x="600" y="290" text-anchor="middle" font-family="Georgia, serif" font-size="72" fill="#FAFAF7" font-weight="500">SkiLuxe</text>
-  <text x="600" y="350" text-anchor="middle" font-family="system-ui, sans-serif" font-size="22" fill="#FAFAF7" opacity="0.78" letter-spacing="6">NEW GUDAURI · CAUCASUS · 2200M</text>
+  <polygon points="0,630 160,400 320,490 460,330 620,460 800,360 980,490 1200,420 1200,630" fill="#0A0F18" opacity="0.85"/>
+  <polygon points="0,630 140,500 320,560 480,470 640,540 820,490 1000,560 1200,520 1200,630" fill="#060910"/>
+  <g transform="translate(600 170) scale(2.2)">
+    <path d="M0 -58 L22 -42 L30 -18 L34 8 L36 52 L0 62 L-36 52 L-34 8 L-30 -18 L-22 -42 Z" fill="url(#gold)"/>
+    <ellipse cx="-14" cy="-6" rx="7" ry="5.2" fill="url(#eye)"/>
+    <ellipse cx="14" cy="-6" rx="7" ry="5.2" fill="url(#eye)"/>
+    <path d="M0 8 L0 20 M-6 14 L6 14" stroke="#6B5416" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <text x="600" y="390" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="68" fill="#F0D78C" font-weight="600" letter-spacing="4">SkiLuxe</text>
+  <text x="600" y="445" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" fill="#FAFAF7" opacity="0.78" letter-spacing="8">NEW GUDAURI · CAUCASUS · 2200M</text>
 </svg>
