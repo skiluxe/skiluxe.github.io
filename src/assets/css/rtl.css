@@ -32,3 +32,19 @@
 .lang-he .site-nav a::after {
   transform-origin: center;
 }
+
+/* Contact page: keep cards left, directions/check-in right (same visual order as English) */
+.lang-he .contact__grid {
+  direction: ltr;
+}
+
+.lang-he .contact__cards,
+.lang-he .contact__notes {
+  direction: rtl;
+}
+
+.lang-he .contact-card p {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: end;
+}
