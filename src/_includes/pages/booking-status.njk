@@ -7,26 +7,40 @@
 </section>
 
 <section class="container section">
-  <div class="booking-payment" id="booking-status">
+  {% set wa_phone = site.whatsapp | replace('+', '') | replace(' ', '') %}
+  <div class="booking-payment" id="booking-status" data-whatsapp-base="https://wa.me/{{ wa_phone }}">
     <div class="booking-payment__loading">
       <p>{{ i18n[lang].hold.checking }}</p>
     </div>
     <div class="booking-payment__pending" hidden>
       <h2>{{ i18n[lang].hold.pending_title }}</h2>
       <p class="booking-payment__text"></p>
-      <a class="btn btn--ghost" href="https://wa.me/{{ site.whatsapp | replace('+', '') | replace(' ', '') }}">{{ i18n[lang].hold.contact_whatsapp }}</a>
+      <div class="booking-payment__actions">
+        <a class="btn btn--ghost booking-status__whatsapp" href="https://wa.me/{{ wa_phone }}" rel="noopener noreferrer">{{ i18n[lang].contact.whatsapp }} · {{ site.whatsappDisplay }}</a>
+      </div>
     </div>
     <div class="booking-payment__success" hidden>
       <h2>{{ i18n[lang].hold.confirmed_title }}</h2>
       <p class="booking-payment__text"></p>
-      <a class="btn btn--primary" href="/{{ lang }}/apartments/">{{ i18n[lang].hold.back_apartments }}</a>
+      <div class="booking-payment__actions">
+        <a class="btn btn--ghost booking-status__whatsapp" href="https://wa.me/{{ wa_phone }}" rel="noopener noreferrer">{{ i18n[lang].contact.whatsapp }} · {{ site.whatsappDisplay }}</a>
+        <a class="btn btn--primary" href="/{{ lang }}/apartments/">{{ i18n[lang].hold.back_apartments }}</a>
+      </div>
     </div>
     <div class="booking-payment__failed" hidden>
       <h2>{{ i18n[lang].hold.cancelled_title }}</h2>
       <p class="booking-payment__text"></p>
-      <a class="btn btn--primary" href="/{{ lang }}/apartments/">{{ i18n[lang].hold.back_apartments }}</a>
+      <div class="booking-payment__actions">
+        <a class="btn btn--ghost booking-status__whatsapp" href="https://wa.me/{{ wa_phone }}" rel="noopener noreferrer">{{ i18n[lang].contact.whatsapp }} · {{ site.whatsappDisplay }}</a>
+        <a class="btn btn--primary" href="/{{ lang }}/apartments/">{{ i18n[lang].hold.back_apartments }}</a>
+      </div>
     </div>
-    <div class="booking-payment__error" role="alert" hidden></div>
+    <div class="booking-payment__error" role="alert" hidden>
+      <p class="booking-payment__error-text"></p>
+      <div class="booking-payment__actions">
+        <a class="btn btn--ghost booking-status__whatsapp" href="https://wa.me/{{ wa_phone }}" rel="noopener noreferrer">{{ i18n[lang].contact.whatsapp }} · {{ site.whatsappDisplay }}</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -36,6 +50,7 @@
     confirmed_text: {{ i18n[lang].hold.confirmed_text | dump | safe }},
     cancelled_text: {{ i18n[lang].hold.cancelled_text | dump | safe }},
     invalid_link: {{ i18n[lang].hold.invalid_link | dump | safe }},
+    whatsapp_message: {{ i18n[lang].hold.whatsapp_message | dump | safe }},
     error_generic: {{ i18n[lang].booking.error_generic | dump | safe }}
   };
 </script>

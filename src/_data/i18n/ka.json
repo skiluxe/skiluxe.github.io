@@ -148,6 +148,7 @@
     "cancelled_title": "დაკავება ვადაგასულია ან გაუქმებულია",
     "cancelled_text": "ეს დაკავება აღარ არის აქტიური (ნომერი {ref}). დაჯავშნეთ თავიდან ან მოგვწერეთ WhatsApp-ში.",
     "invalid_link": "ბმული არასწორია ან ვადაგასულია.",
+    "whatsapp_message": "გამარჯობა, მაქვს ჯავშანი {ref} — {apartment} ({checkin} → {checkout}).",
     "back_apartments": "აპარტამენტებზე დაბრუნება",
     "contact_whatsapp": "WhatsApp"
   },

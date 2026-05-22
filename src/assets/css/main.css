@@ -576,4 +576,12 @@ p { margin: 0 0 1em; }
 .booking-payment h2 { margin-top: 0; font-family: var(--font-display); }
 .booking-payment__text { color: var(--muted); margin-bottom: 24px; }
 .booking-payment .btn { margin-top: 8px; }
+.booking-payment__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+.booking-payment__actions .btn { margin-top: 0; width: 100%; }
+.booking-payment__error-text { margin: 0 0 4px; }
 .booking-payment__error { color: #b42318; }

@@ -148,6 +148,7 @@
     "cancelled_title": "השמירה פגה או בוטלה",
     "cancelled_text": "השמירה הזו כבר לא פעילה (מספר {ref}). הזמינו שוב או כתבו לנו ב‑WhatsApp.",
     "invalid_link": "הקישור לא תקין או שפג תוקפו.",
+    "whatsapp_message": "שלום, יש לי הזמנה {ref} — {apartment} ({checkin} → {checkout}).",
     "back_apartments": "חזרה לדירות",
     "contact_whatsapp": "WhatsApp"
   },

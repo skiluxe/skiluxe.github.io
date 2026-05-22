@@ -150,6 +150,7 @@
     "cancelled_title": "Hold expired or cancelled",
     "cancelled_text": "This hold is no longer active (reference {ref}). Please book again or contact us on WhatsApp.",
     "invalid_link": "This link is invalid or has expired.",
+    "whatsapp_message": "Hi, I have a booking hold {ref} for {apartment} ({checkin} → {checkout}).",
     "back_apartments": "Browse apartments",
     "contact_whatsapp": "WhatsApp us"
   },

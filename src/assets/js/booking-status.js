@@ -43,12 +43,22 @@ function hide(el) {
 
 function fill(template, data) {
   return String(template || "")
-    .replace("{ref}", data.ref)
-    .replace("{apartment}", data.apartment)
-    .replace("{checkin}", data.checkin)
-    .replace("{checkout}", data.checkout)
-    .replace("{total}", data.total)
-    .replace("{expires}", data.expires);
+    .replace(/\{ref\}/g, data.ref)
+    .replace(/\{apartment\}/g, data.apartment)
+    .replace(/\{checkin\}/g, data.checkin)
+    .replace(/\{checkout\}/g, data.checkout)
+    .replace(/\{total\}/g, data.total)
+    .replace(/\{expires\}/g, data.expires);
+}
+
+function setWhatsAppLinks(root, vars) {
+  const base = root?.dataset?.whatsappBase || "";
+  if (!base) return;
+  const text = fill(STR.whatsapp_message, vars);
+  const href = text ? `${base}?text=${encodeURIComponent(text)}` : base;
+  root.querySelectorAll(".booking-status__whatsapp").forEach((a) => {
+    a.href = href;
+  });
 }
 
 async function loadBookingStatus() {
@@ -65,7 +75,8 @@ async function loadBookingStatus() {
   const token = qs("token");
   if (!id || !token || !apiBase) {
     hide(loading);
-    error.textContent = STR.invalid_link || STR.error_generic || "Invalid link.";
+    const errText = root.querySelector(".booking-payment__error-text");
+    if (errText) errText.textContent = STR.invalid_link || STR.error_generic || "Invalid link.";
     show(error);
     return;
   }
@@ -76,7 +87,8 @@ async function loadBookingStatus() {
     );
     if (res.status === 403 || res.status === 404) {
       hide(loading);
-      error.textContent = STR.invalid_link || "Invalid link.";
+      const errText = root.querySelector(".booking-payment__error-text");
+      if (errText) errText.textContent = STR.invalid_link || "Invalid link.";
       show(error);
       return;
     }
@@ -93,6 +105,7 @@ async function loadBookingStatus() {
     };
 
     hide(loading);
+    setWhatsAppLinks(root, vars);
 
     if (data.status === "confirmed") {
       success.querySelector(".booking-payment__text").textContent = fill(STR.confirmed_text, vars);
@@ -110,7 +123,8 @@ async function loadBookingStatus() {
     show(pending);
   } catch (_) {
     hide(loading);
-    error.textContent = STR.error_generic || "Something went wrong.";
+    const errText = root.querySelector(".booking-payment__error-text");
+    if (errText) errText.textContent = STR.error_generic || "Something went wrong.";
     show(error);
   }
 }
