@@ -108,7 +108,7 @@
     "coupon_code": "Coupon code",
     "coupon_placeholder": "Enter code",
     "coupon_discount": "Coupon {code} ({percent}%)",
-    "invalid_coupon": "Invalid coupon code.",
+    "invalid_coupon": "Invalid coupon code. Remove it or enter a valid code to book.",
     "total": "Total",
     "non_refundable_label": "Non-refundable rate (save more)",
     "non_refundable_help": "Reduced price in exchange for no refunds after booking.",

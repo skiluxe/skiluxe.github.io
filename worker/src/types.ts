@@ -138,4 +138,5 @@ export interface QuoteResult {
   infants: number;
   computed_at: number;
   coupon_code?: string | null;
+  coupon_error?: "invalid_coupon" | null;
 }

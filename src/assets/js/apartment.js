@@ -365,21 +365,15 @@ function initBooking() {
           setSubmitEnabled(false);
           return;
         }
-        if (res.status === 400) {
-          let detail = "";
-          try { const j = await res.json(); detail = j.error || ""; } catch (_) {}
-          if (detail === "invalid_coupon") {
-            quoteBox.hidden = true;
-            showHint("");
-            showError(STR.invalid_coupon || "Invalid coupon code.");
-            setSubmitEnabled(false);
-            return;
-          }
-        }
         if (!res.ok) throw new Error("quote failed");
         const q = await res.json();
         renderQuote(q);
-        setSubmitEnabled(true);
+        if (q.coupon_error === "invalid_coupon") {
+          showError(STR.invalid_coupon || "Invalid coupon code.");
+          setSubmitEnabled(false);
+        } else {
+          setSubmitEnabled(true);
+        }
       } catch (e) {
         quoteBox.hidden = true;
         showHint("");

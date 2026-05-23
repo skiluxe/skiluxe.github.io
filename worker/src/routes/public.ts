@@ -112,7 +112,7 @@ publicRoutes.post("/apartments/:slug/quote", async (c) => {
 
   const couponRequested = (coupon_code || "").trim();
   const coupon = couponRequested ? await resolveCoupon(c.env.DB, couponRequested) : null;
-  if (couponRequested && !coupon) return c.json({ error: "invalid_coupon" }, 400);
+  const couponInvalid = !!couponRequested && !coupon;
 
   const available = await isRangeAvailable(c.env.DB, apt.id, checkin, checkout);
   if (!available) return c.json({ error: "unavailable" }, 409);
@@ -129,7 +129,7 @@ publicRoutes.post("/apartments/:slug/quote", async (c) => {
     infants,
     coupon: coupon ? { code: coupon.code.toUpperCase(), percent: coupon.percent } : null,
   });
-  return c.json(q);
+  return c.json({ ...q, coupon_error: couponInvalid ? "invalid_coupon" : null });
 });
 
 publicRoutes.post("/bookings", async (c) => {
