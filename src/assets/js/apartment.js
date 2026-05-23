@@ -294,7 +294,7 @@ function initBooking() {
     if (payIdle) payIdle.hidden = false;
     if (payBusy) payBusy.hidden = true;
     if (holdIdle) holdIdle.hidden = false;
-    if (holdBusy) holdBusy.hidden = false;
+    if (holdBusy) holdBusy.hidden = true;
   }
 
   async function refreshQuote() {
