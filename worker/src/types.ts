@@ -69,6 +69,14 @@ export interface Promotion {
   stackable: number;
 }
 
+export interface Coupon {
+  id: number;
+  code: string;
+  percent: number;
+  active: number;
+  created_at: number;
+}
+
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "expired";
 
 export interface Booking {
@@ -94,6 +102,7 @@ export interface Booking {
   tbc_pay_id: string | null;
   payment_status: string | null;
   paid_at: number | null;
+  coupon_code: string | null;
 }
 
 export interface IcalSource {
@@ -128,4 +137,5 @@ export interface QuoteResult {
   paying_guests: number;
   infants: number;
   computed_at: number;
+  coupon_code?: string | null;
 }

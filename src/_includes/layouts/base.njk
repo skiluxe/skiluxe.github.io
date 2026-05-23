@@ -41,6 +41,8 @@
       extra_guests_surcharge: {{ i18n[lang].booking.extra_guests_surcharge | dump | safe }},
       weekly_discount: {{ i18n[lang].booking.weekly_discount | dump | safe }},
       non_refundable_discount: {{ i18n[lang].booking.non_refundable_discount | dump | safe }},
+      coupon_discount: {{ i18n[lang].booking.coupon_discount | dump | safe }},
+      invalid_coupon: {{ i18n[lang].booking.invalid_coupon | dump | safe }},
       success_text: {{ i18n[lang].booking.success_text | dump | safe }},
       redirecting_payment: {{ i18n[lang].booking.redirecting_payment | dump | safe }},
       payment_failed: {{ i18n[lang].booking.payment_failed | default(i18n[lang].booking.error_generic) | dump | safe }},

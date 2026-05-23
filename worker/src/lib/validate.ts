@@ -11,6 +11,7 @@ export const QuoteInput = z.object({
   /** Infants aged 0–3 (free, not counted in occupancy pricing). */
   infants: z.number().int().min(0).max(10).default(0),
   non_refundable: z.boolean().optional().default(false),
+  coupon_code: z.string().max(32).optional(),
 });
 
 export const BookingInput = z.object({
@@ -21,6 +22,7 @@ export const BookingInput = z.object({
   guests_count: z.number().int().positive().max(20),
   infants_count: z.number().int().min(0).max(10).optional().default(0),
   non_refundable: z.boolean().optional().default(false),
+  coupon_code: z.string().max(32).optional(),
   /** "pay" tries online checkout; "hold" creates a 24h pending hold with email notifications. */
   payment_mode: z.enum(["pay", "hold"]).optional().default("pay"),
   guest: z.object({
@@ -55,6 +57,12 @@ export const PromotionInput = z.object({
     percent: z.number().positive().max(90),
   }),
   stackable: z.boolean().default(true),
+});
+
+export const CouponInput = z.object({
+  code: z.string().min(2).max(32).regex(/^[A-Za-z0-9_-]+$/),
+  percent: z.number().positive().max(90),
+  active: z.boolean().default(true),
 });
 
 export const IcalSourceInput = z.object({

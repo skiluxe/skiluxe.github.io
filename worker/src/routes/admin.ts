@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { Env, Booking } from "../types";
 import { clearSessionCookie, createSession, isPasswordHashFormat, verifyPassword, verifySession } from "../lib/auth";
-import { LoginInput, SeasonInput, PromotionInput, IcalSourceInput, DateOverrideInput } from "../lib/validate";
+import { LoginInput, SeasonInput, PromotionInput, CouponInput, IcalSourceInput, DateOverrideInput } from "../lib/validate";
 import { audit } from "../lib/db";
 
 export const adminRoutes = new Hono<{ Bindings: Env }>();
@@ -210,6 +210,60 @@ adminRoutes.patch("/promotions/:id", async (c) => {
 adminRoutes.delete("/promotions/:id", async (c) => {
   const id = parseInt(c.req.param("id"), 10);
   await c.env.DB.prepare("DELETE FROM promotions WHERE id = ?").bind(id).run();
+  return c.json({ ok: true });
+});
+
+// ------- Coupons -------
+adminRoutes.get("/coupons", async (c) => {
+  const { results } = await c.env.DB.prepare("SELECT * FROM coupons ORDER BY code").all();
+  return c.json({ coupons: results || [] });
+});
+
+adminRoutes.post("/coupons", async (c) => {
+  const parsed = CouponInput.safeParse(await c.req.json().catch(() => ({})));
+  if (!parsed.success) return c.json({ error: "invalid_input" }, 400);
+  const p = parsed.data;
+  const code = p.code.trim().toUpperCase();
+  try {
+    const res = await c.env.DB.prepare(
+      "INSERT INTO coupons (code, percent, active) VALUES (?, ?, ?)"
+    ).bind(code, p.percent, p.active ? 1 : 0).run();
+    await audit(c.env.DB, "admin", "coupon.create", "coupons", Number(res.meta.last_row_id), { code, percent: p.percent });
+    return c.json({ id: Number(res.meta.last_row_id) }, 201);
+  } catch (e: any) {
+    if (String(e?.message || "").includes("UNIQUE")) return c.json({ error: "duplicate_code" }, 409);
+    throw e;
+  }
+});
+
+adminRoutes.patch("/coupons/:id", async (c) => {
+  const id = parseInt(c.req.param("id"), 10);
+  const body = await c.req.json().catch(() => ({}));
+  const fields: string[] = [];
+  const binds: any[] = [];
+  if (body.percent !== undefined) { fields.push("percent = ?"); binds.push(body.percent); }
+  if (body.active !== undefined) { fields.push("active = ?"); binds.push(body.active ? 1 : 0); }
+  if (body.code !== undefined) {
+    const code = String(body.code).trim().toUpperCase();
+    if (!/^[A-Z0-9_-]{2,32}$/.test(code)) return c.json({ error: "invalid_code" }, 400);
+    fields.push("code = ?");
+    binds.push(code);
+  }
+  if (!fields.length) return c.json({ error: "nothing" }, 400);
+  binds.push(id);
+  try {
+    await c.env.DB.prepare(`UPDATE coupons SET ${fields.join(", ")} WHERE id = ?`).bind(...binds).run();
+    return c.json({ ok: true });
+  } catch (e: any) {
+    if (String(e?.message || "").includes("UNIQUE")) return c.json({ error: "duplicate_code" }, 409);
+    throw e;
+  }
+});
+
+adminRoutes.delete("/coupons/:id", async (c) => {
+  const id = parseInt(c.req.param("id"), 10);
+  await c.env.DB.prepare("DELETE FROM coupons WHERE id = ?").bind(id).run();
+  await audit(c.env.DB, "admin", "coupon.delete", "coupons", id, null);
   return c.json({ ok: true });
 });
 

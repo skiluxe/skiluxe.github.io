@@ -7,6 +7,7 @@ import {
   listSeasons,
   listDateOverrides,
   listActivePromotions,
+  resolveCoupon,
   bookingsForApartmentRange,
   icalEventsForApartmentRange,
   isRangeAvailable,
@@ -102,12 +103,16 @@ publicRoutes.post("/apartments/:slug/quote", async (c) => {
   const parsed = QuoteInput.safeParse(body);
   if (!parsed.success) return c.json({ error: "invalid_input", details: parsed.error.flatten() }, 400);
 
-  const { checkin, checkout, guests, infants, non_refundable } = parsed.data;
+  const { checkin, checkout, guests, infants, non_refundable, coupon_code } = parsed.data;
   if (nightsBetween(checkin, checkout) < 1) return c.json({ error: "invalid_range" }, 400);
 
   const apt = await getApartmentBySlug(c.env.DB, slug);
   if (!apt) return c.json({ error: "not_found" }, 404);
   if (guests + infants > apt.max_guests) return c.json({ error: "too_many_guests", max: apt.max_guests }, 400);
+
+  const couponRequested = (coupon_code || "").trim();
+  const coupon = couponRequested ? await resolveCoupon(c.env.DB, couponRequested) : null;
+  if (couponRequested && !coupon) return c.json({ error: "invalid_coupon" }, 400);
 
   const available = await isRangeAvailable(c.env.DB, apt.id, checkin, checkout);
   if (!available) return c.json({ error: "unavailable" }, 409);
@@ -122,6 +127,7 @@ publicRoutes.post("/apartments/:slug/quote", async (c) => {
     non_refundable,
     paying_guests: guests,
     infants,
+    coupon: coupon ? { code: coupon.code.toUpperCase(), percent: coupon.percent } : null,
   });
   return c.json(q);
 });
@@ -137,12 +143,16 @@ publicRoutes.post("/bookings", async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const parsed = BookingInput.safeParse(body);
   if (!parsed.success) return c.json({ error: "invalid_input", details: parsed.error.flatten() }, 400);
-  const { apartment_slug, checkin, checkout, guests_count, infants_count, non_refundable, payment_mode, guest } = parsed.data;
+  const { apartment_slug, checkin, checkout, guests_count, infants_count, non_refundable, coupon_code, payment_mode, guest } = parsed.data;
   if (nightsBetween(checkin, checkout) < 1) return c.json({ error: "min_stay" }, 400);
 
   const apt = await getApartmentBySlug(c.env.DB, apartment_slug);
   if (!apt) return c.json({ error: "not_found" }, 404);
   if (guests_count + infants_count > apt.max_guests) return c.json({ error: "too_many_guests", max: apt.max_guests }, 400);
+
+  const couponRequested = (coupon_code || "").trim();
+  const coupon = couponRequested ? await resolveCoupon(c.env.DB, couponRequested) : null;
+  if (couponRequested && !coupon) return c.json({ error: "invalid_coupon" }, 400);
 
   const available = await isRangeAvailable(c.env.DB, apt.id, checkin, checkout);
   if (!available) return c.json({ error: "unavailable" }, 409);
@@ -157,14 +167,16 @@ publicRoutes.post("/bookings", async (c) => {
     non_refundable,
     paying_guests: guests_count,
     infants: infants_count,
+    coupon: coupon ? { code: coupon.code.toUpperCase(), percent: coupon.percent } : null,
   });
 
   const holdMs = (parseInt(c.env.HOLD_HOURS || "24", 10) || 24) * 60 * 60 * 1000;
   const holdExpires = Date.now() + holdMs;
+  const appliedCouponCode = coupon ? coupon.code.toUpperCase() : null;
 
   const result = await c.env.DB.prepare(
-    `INSERT INTO bookings (apartment_id, checkin, checkout, guest_name, guest_email, guest_phone, guest_lang, guests_count, status, non_refundable, quote_json, total_amount, currency, notes, hold_expires_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO bookings (apartment_id, checkin, checkout, guest_name, guest_email, guest_phone, guest_lang, guests_count, status, non_refundable, quote_json, total_amount, currency, notes, hold_expires_at, coupon_code)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     apt.id,
     checkin,
@@ -179,7 +191,8 @@ publicRoutes.post("/bookings", async (c) => {
     q.total,
     q.currency,
     guest.notes || null,
-    holdExpires
+    holdExpires,
+    appliedCouponCode
   ).run();
 
   const bookingId = Number(result.meta.last_row_id);

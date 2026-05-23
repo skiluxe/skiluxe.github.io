@@ -65,7 +65,12 @@ export function quote(
   promos: Promotion[],
   checkin: string,
   checkout: string,
-  flags: { non_refundable?: boolean; paying_guests?: number; infants?: number } = {}
+  flags: {
+    non_refundable?: boolean;
+    paying_guests?: number;
+    infants?: number;
+    coupon?: { code: string; percent: number } | null;
+  } = {}
 ): QuoteResult {
   const payingGuests = Math.max(1, flags.paying_guests ?? BASE_OCCUPANCY);
   const infants = Math.max(0, flags.infants ?? 0);
@@ -128,6 +133,18 @@ export function quote(
     discounts.push({ kind: "non_refundable", label: "Non-refundable", amount, percent });
   }
 
+  if (flags.coupon) {
+    const alreadyApplied = discounts.reduce((a, d) => a + d.amount, 0);
+    const base = afterAdjustments - alreadyApplied;
+    const amount = Math.round((base * flags.coupon.percent) / 100);
+    discounts.push({
+      kind: "coupon",
+      label: `Coupon ${flags.coupon.code}`,
+      amount,
+      percent: flags.coupon.percent,
+    });
+  }
+
   const total = afterAdjustments - discounts.reduce((acc, d) => acc + d.amount, 0);
 
   return {
@@ -141,6 +158,7 @@ export function quote(
     paying_guests: payingGuests,
     infants,
     computed_at: Date.now(),
+    coupon_code: flags.coupon?.code ?? null,
   };
 }
 

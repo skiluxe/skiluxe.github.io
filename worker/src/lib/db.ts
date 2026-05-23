@@ -1,4 +1,4 @@
-import type { Apartment, Booking, DateOverride, IcalEvent, IcalSource, Promotion, Season } from "../types";
+import type { Apartment, Booking, Coupon, DateOverride, IcalEvent, IcalSource, Promotion, Season } from "../types";
 
 export async function getApartmentBySlug(db: D1Database, slug: string): Promise<Apartment | null> {
   return (await db.prepare("SELECT * FROM apartments WHERE slug = ?").bind(slug).first<Apartment>()) || null;
@@ -120,6 +120,22 @@ export async function listIcalSources(db: D1Database, apartmentId?: number): Pro
   }
   const { results } = await db.prepare("SELECT * FROM ical_sources").all<IcalSource>();
   return results || [];
+}
+
+export async function listCoupons(db: D1Database): Promise<Coupon[]> {
+  const { results } = await db.prepare("SELECT * FROM coupons ORDER BY code").all<Coupon>();
+  return results || [];
+}
+
+export async function resolveCoupon(db: D1Database, code?: string | null): Promise<Coupon | null> {
+  const trimmed = (code || "").trim();
+  if (!trimmed) return null;
+  return (
+    (await db
+      .prepare("SELECT * FROM coupons WHERE code = ? COLLATE NOCASE AND active = 1")
+      .bind(trimmed)
+      .first<Coupon>()) || null
+  );
 }
 
 export async function audit(

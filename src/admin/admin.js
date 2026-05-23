@@ -66,6 +66,7 @@ const routes = {
   "/bookings": renderBookings,
   "/pricing": renderPricing,
   "/promotions": renderPromotions,
+  "/coupons": renderCoupons,
   "/ical": renderIcal,
   "/conflicts": renderConflicts,
   "/audit": renderAudit,
@@ -101,6 +102,7 @@ function layout(content, active = "") {
         navLink("#/bookings", "Bookings", active === "bookings"),
         navLink("#/pricing", "Pricing", active === "pricing"),
         navLink("#/promotions", "Promotions", active === "promotions"),
+        navLink("#/coupons", "Coupons", active === "coupons"),
         navLink("#/ical", "iCal feeds", active === "ical"),
         navLink("#/conflicts", "Conflicts", active === "conflicts"),
         navLink("#/audit", "Audit log", active === "audit"),
@@ -531,6 +533,72 @@ function promoForm(apartments) {
     await api("/api/admin/promotions", { method: "POST", body });
     toast("Promotion added");
     renderPromotions();
+  });
+  return f;
+}
+
+async function renderCoupons() {
+  if (!(await ensureSession())) return;
+  const { coupons } = await api("/api/admin/coupons");
+
+  layout([
+    el("h1", { class: "page-title" }, "Coupon codes"),
+    el("div", { class: "card" }, [
+      el("h2", {}, "Active codes"),
+      coupons.length === 0
+        ? el("p", { class: "empty" }, "No coupon codes yet.")
+        : el("table", {}, [
+          el("thead", {}, el("tr", {}, [
+            el("th", {}, "Code"), el("th", {}, "Discount"), el("th", {}, "Active"), el("th", {}, ""),
+          ])),
+          el("tbody", {}, coupons.map((c) => couponRow(c))),
+        ]),
+    ]),
+    el("div", { class: "card" }, [
+      el("h2", {}, "Add coupon"),
+      couponForm(),
+    ]),
+  ], "coupons");
+}
+
+function couponRow(c) {
+  return el("tr", {}, [
+    el("td", {}, el("code", {}, c.code)),
+    el("td", {}, `${c.percent}%`),
+    el("td", {}, el("button", { class: "btn btn--ghost btn--sm", onClick: async () => {
+      await api(`/api/admin/coupons/${c.id}`, { method: "PATCH", body: { active: !c.active } });
+      renderCoupons();
+    } }, c.active ? "On" : "Off")),
+    el("td", {}, el("button", { class: "btn btn--ghost btn--sm", onClick: async () => {
+      if (!confirm("Delete coupon?")) return;
+      await api(`/api/admin/coupons/${c.id}`, { method: "DELETE" });
+      renderCoupons();
+    } }, "Remove")),
+  ]);
+}
+
+function couponForm() {
+  const f = el("form", { style: "display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px" }, [
+    el("input", { name: "code", type: "text", placeholder: "Code (e.g. SKI10)", required: true, style: "text-transform:uppercase" }),
+    el("input", { name: "percent", type: "number", placeholder: "Discount % (e.g. 10)", min: "1", max: "90", step: "0.1", required: true }),
+    el("button", { class: "btn btn--sm", type: "submit" }, "Add"),
+  ]);
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(f);
+    const body = {
+      code: String(fd.get("code") || "").trim().toUpperCase(),
+      percent: parseFloat(fd.get("percent")),
+      active: true,
+    };
+    try {
+      await api("/api/admin/coupons", { method: "POST", body });
+      toast("Coupon added");
+      f.reset();
+      renderCoupons();
+    } catch (err) {
+      toast(err.message.includes("duplicate") ? "Code already exists" : "Could not add coupon", "err");
+    }
   });
   return f;
 }

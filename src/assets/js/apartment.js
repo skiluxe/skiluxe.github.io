@@ -232,6 +232,7 @@ function initBooking() {
   const checkout = form.querySelector('[name="checkout"]');
   const guests = form.querySelector('[name="guests"]');
   const infants = form.querySelector('[name="infants"]');
+  const couponCode = form.querySelector('[name="coupon_code"]');
   const nonRefundable = form.querySelector('[name="non_refundable"]');
   const quoteBox = widget.querySelector(".booking__quote");
   const quoteLines = widget.querySelector(".booking__quote-lines");
@@ -276,6 +277,10 @@ function initBooking() {
 
   let quoteTimer;
   let datesUnavailable = false;
+
+  function normalizedCoupon() {
+    return (couponCode?.value || "").trim().toUpperCase();
+  }
 
   function setSubmitEnabled(enabled) {
     submitButtons.forEach((btn) => { btn.disabled = !enabled; });
@@ -349,6 +354,7 @@ function initBooking() {
             guests: parseInt(guests.value, 10),
             infants: parseInt(infants?.value || "0", 10),
             non_refundable: !!nonRefundable.checked,
+            coupon_code: normalizedCoupon() || undefined,
           }),
         });
         if (res.status === 409) {
@@ -358,6 +364,17 @@ function initBooking() {
           datesUnavailable = true;
           setSubmitEnabled(false);
           return;
+        }
+        if (res.status === 400) {
+          let detail = "";
+          try { const j = await res.json(); detail = j.error || ""; } catch (_) {}
+          if (detail === "invalid_coupon") {
+            quoteBox.hidden = true;
+            showHint("");
+            showError(STR.invalid_coupon || "Invalid coupon code.");
+            setSubmitEnabled(false);
+            return;
+          }
         }
         if (!res.ok) throw new Error("quote failed");
         const q = await res.json();
@@ -379,6 +396,12 @@ function initBooking() {
     }
     if (a.kind === "weekly") return STR.weekly_discount || a.label;
     if (a.kind === "non_refundable") return STR.non_refundable_discount || a.label;
+    if (a.kind === "coupon") {
+      const code = (a.label || "").replace(/^Coupon\s+/i, "") || "";
+      return (STR.coupon_discount || "Coupon {code} ({percent}%)")
+        .replace("{code}", code)
+        .replace("{percent}", String(a.percent ?? ""));
+    }
     return a.label || a.kind;
   }
 
@@ -413,10 +436,13 @@ function initBooking() {
     syncCheckoutFromCheckin();
     refreshQuote();
   });
-  [checkout, guests, infants, nonRefundable].forEach((el) => {
+  [checkout, guests, infants, nonRefundable, couponCode].forEach((el) => {
     if (!el) return;
     el.addEventListener("change", refreshQuote);
     el.addEventListener("input", refreshQuote);
+  });
+  couponCode?.addEventListener("blur", () => {
+    if (couponCode.value) couponCode.value = couponCode.value.trim().toUpperCase();
   });
 
   // Set defaults & initial quote
@@ -453,6 +479,7 @@ function initBooking() {
           guests_count: g,
           infants_count: infantCount,
           non_refundable: !!fd.get("non_refundable"),
+          coupon_code: normalizedCoupon() || undefined,
           payment_mode: paymentMode,
           guest: {
             name: String(fd.get("name") || ""),
@@ -477,6 +504,10 @@ function initBooking() {
         try { const j = await res.json(); detail = j.error || ""; } catch (_) {}
         if (detail === "payment_init_failed") {
           showError(STR.payment_failed || "Could not start payment. Please try again or contact us on WhatsApp.");
+          return;
+        }
+        if (detail === "invalid_coupon") {
+          showError(STR.invalid_coupon || "Invalid coupon code.");
           return;
         }
         throw new Error(detail || `booking failed ${res.status}`);

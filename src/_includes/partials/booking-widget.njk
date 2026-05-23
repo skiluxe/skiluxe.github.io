@@ -37,6 +37,11 @@
       <small class="booking__guests-help">{{ i18n[lang].booking.infants_help }}</small>
     </label>
 
+    <label class="booking__coupon">
+      <span>{{ i18n[lang].booking.coupon_code }}</span>
+      <input type="text" name="coupon_code" autocomplete="off" placeholder="{{ i18n[lang].booking.coupon_placeholder }}" maxlength="32" style="text-transform:uppercase">
+    </label>
+
     <div class="booking__quote" hidden>
       <ul class="booking__quote-lines"></ul>
       <div class="booking__quote-total">
