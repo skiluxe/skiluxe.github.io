@@ -234,6 +234,17 @@
 .picker-month__cell.is-range-start { border-radius: 6px 0 0 6px; }
 .picker-month__cell.is-range-end { border-radius: 0 6px 6px 0; }
 .picker-month__cell.is-range-start.is-range-end { border-radius: 6px; }
+.picker-month__cell.is-blocked:not(.is-range-start) {
+  background: transparent;
+  border-color: transparent;
+  border-radius: 6px;
+  color: rgba(91, 107, 128, 0.55);
+  font-weight: 400;
+  opacity: 1;
+}
+.picker-month__cell.is-blocked:not(.is-range-start):focus-visible {
+  outline: none;
+}
 
 .booking__picker-legend {
   display: flex;
