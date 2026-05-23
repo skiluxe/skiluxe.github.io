@@ -159,8 +159,14 @@
 }
 .booking__picker-months {
   display: grid;
-  gap: 16px;
+  gap: 18px clamp(28px, 4vw, 44px);
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.booking__picker-months[data-month-count="1"] {
+  grid-template-columns: 1fr;
+}
+.picker-month {
+  min-width: 0;
 }
 .picker-month__title {
   font-family: var(--font-display);
@@ -172,14 +178,16 @@
 }
 .picker-month__grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 3px;
+  min-width: 0;
 }
 .picker-month__dow {
   font-size: 0.65rem;
   text-align: center;
   color: var(--muted);
   padding: 2px 0;
+  min-width: 0;
 }
 .picker-month__cell {
   aspect-ratio: 1 / 1;
@@ -196,6 +204,7 @@
   font: inherit;
   cursor: default;
   position: relative;
+  min-width: 0;
 }
 .picker-month__cell.is-empty { visibility: hidden; }
 .picker-month__cell.is-past { color: rgba(91, 107, 128, 0.35); }

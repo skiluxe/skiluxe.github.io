@@ -178,8 +178,9 @@ function monthGridCells(year, month, statusByDate, today) {
   return cells;
 }
 
-function pickerMonthCount() {
-  return window.matchMedia("(min-width: 640px)").matches ? 2 : 1;
+function pickerMonthCount(el) {
+  const width = el?.getBoundingClientRect().width || window.innerWidth;
+  return width >= 560 ? 2 : 1;
 }
 
 function weekdayLabels() {
@@ -229,6 +230,7 @@ function initBooking() {
   const defIn = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
   let viewStart = startOfMonth(defIn);
   let awaitingCheckout = false;
+  let renderedMonthCount = 0;
 
   function normalizedCoupon() {
     return (couponCode?.value || "").trim().toUpperCase();
@@ -452,7 +454,10 @@ function initBooking() {
 
   async function renderPicker() {
     if (!pickerMonths) return;
-    const count = pickerMonthCount();
+    if (picker) picker.hidden = false;
+    const count = pickerMonthCount(pickerMonths);
+    renderedMonthCount = count;
+    pickerMonths.dataset.monthCount = String(count);
     const fetchEnd = endOfMonth(addMonths(viewStart, count - 1));
     const statusByDate = await ensureAvailability(slug, viewStart, fetchEnd);
     const dows = weekdayLabels();
@@ -487,7 +492,6 @@ function initBooking() {
     pickerMonths.querySelectorAll(".picker-month__cell[data-date]").forEach((btn) => {
       btn.addEventListener("click", () => onPickDate(btn.dataset.date));
     });
-    if (picker) picker.hidden = false;
   }
 
   function onPickDate(key) {
@@ -540,7 +544,14 @@ function initBooking() {
     renderPicker();
   });
 
-  window.matchMedia("(min-width: 640px)").addEventListener("change", () => renderPicker());
+  if ("ResizeObserver" in window && pickerMonths) {
+    const resizeObserver = new ResizeObserver(() => {
+      if (pickerMonthCount(pickerMonths) !== renderedMonthCount) renderPicker();
+    });
+    resizeObserver.observe(pickerMonths);
+  } else {
+    window.addEventListener("resize", () => renderPicker());
+  }
 
   [guests, infants, nonRefundable, couponCode].forEach((el) => {
     if (!el) return;
