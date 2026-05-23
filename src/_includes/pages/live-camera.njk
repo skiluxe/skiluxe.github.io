@@ -9,14 +9,17 @@
 <section class="container section live-camera">
   <div class="live-camera__stream">
     <h2 class="live-camera__heading">{{ i18n[lang].live_camera.stream_title }}</h2>
-    <div class="live-camera__embed">
-      <iframe
-        src="https://www.youtube.com/embed/live_stream?channel={{ site.youtubeChannelId }}"
-        title="{{ i18n[lang].live_camera.title }}"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen
-        loading="lazy"
-      ></iframe>
+    <div class="live-camera__embed-wrap">
+      <div
+        class="live-camera__embed"
+        id="live-camera-embed"
+        data-channel-id="{{ site.youtubeChannelId }}"
+        data-title="{{ i18n[lang].live_camera.title }}"
+        data-unmute="{{ i18n[lang].live_camera.unmute }}"
+      ></div>
+      <button type="button" class="live-camera__unmute btn btn--ghost" hidden>
+        {{ i18n[lang].live_camera.unmute }}
+      </button>
     </div>
     <p class="live-camera__stream-note">{{ i18n[lang].live_camera.stream_note }}</p>
   </div>

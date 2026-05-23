@@ -181,6 +181,7 @@
     "subtitle": "Watch the slopes in real time from New Gudauri.",
     "stream_title": "YouTube Live",
     "stream_note": "When we're not streaming, use the Reolink instructions below to view the camera directly.",
+    "unmute": "Unmute",
     "fallback_title": "If the Livestream Doesn't Work",
     "step1_title": "Download the Reolink App",
     "step1_text": "Available on both the App Store and Google Play Store.",
