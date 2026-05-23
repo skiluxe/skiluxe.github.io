@@ -328,23 +328,31 @@ async function notifyOwnerAndGuest(env: Env, bookingId: number, apt: Apartment, 
   await sendWhatsApp(env, `SkiLuxe booking #${bookingId} — ${apt.slug} ${b.checkin}→${b.checkout} ${b.currency} ${(b.total_amount/100).toFixed(0)} — confirm: ${env.SITE_ORIGIN}/admin/`);
 }
 
-const YOUTUBE_CHANNEL_ID = "UCJymmFi70lS6q2ZwnsAGabw";
+const YOUTUBE_LIVE_PAGE = "https://www.youtube.com/@gudauriflats/live";
 
 publicRoutes.get("/youtube/live", async (c) => {
   const cacheKey = "youtube:live";
   const cached = await c.env.KV.get(cacheKey, "json") as { live: boolean; videoId?: string } | null;
   if (cached) return c.json(cached);
 
-  const liveUrl = `https://www.youtube.com/channel/${YOUTUBE_CHANNEL_ID}/live`;
   try {
-    const res = await fetch(liveUrl, {
+    const res = await fetch(YOUTUBE_LIVE_PAGE, {
       redirect: "follow",
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; SkiLuxeBot/1.0)" },
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+      },
     });
-    const match = res.url.match(/[?&]v=([A-Za-z0-9_-]{11})/);
-    const payload = match
-      ? { live: true, videoId: match[1] }
-      : { live: false };
+    const html = await res.text();
+    const isLive = html.includes('"isLiveNow":true');
+    const canonical = html.match(
+      /rel="canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([A-Za-z0-9_-]{11})"/
+    );
+    const payload =
+      isLive && canonical
+        ? { live: true, videoId: canonical[1] }
+        : { live: false };
     await c.env.KV.put(cacheKey, JSON.stringify(payload), { expirationTtl: 60 });
     return c.json(payload);
   } catch (e) {

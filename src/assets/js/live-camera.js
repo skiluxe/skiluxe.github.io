@@ -1,18 +1,15 @@
 const CFG = window.SKILUXE_CONFIG || {};
 
-function embedQuery(autoplay) {
-  const params = new URLSearchParams({
-    playsinline: "1",
-    rel: "0",
-    modestbranding: "1",
-    enablejsapi: "1",
+function playerVars() {
+  return {
+    autoplay: 1,
+    mute: 1,
+    playsinline: 1,
+    rel: 0,
+    modestbranding: 1,
+    enablejsapi: 1,
     origin: window.location.origin,
-  });
-  if (autoplay) {
-    params.set("autoplay", "1");
-    params.set("mute", "1");
-  }
-  return params.toString();
+  };
 }
 
 function loadYouTubeIframeApi() {
@@ -32,19 +29,28 @@ function loadYouTubeIframeApi() {
 }
 
 async function fetchLiveStatus() {
-  if (!CFG.apiBase) return { live: null, videoId: null, checked: false };
+  if (!CFG.apiBase) return { videoId: null };
   try {
     const res = await fetch(`${CFG.apiBase}/api/youtube/live`);
-    if (!res.ok) return { live: null, videoId: null, checked: false };
+    if (!res.ok) return { videoId: null };
     const data = await res.json();
-    return {
-      live: !!data.live,
-      videoId: data.videoId || null,
-      checked: true,
-    };
+    return { videoId: data.live && data.videoId ? data.videoId : null };
   } catch (_) {
-    return { live: null, videoId: null, checked: false };
+    return { videoId: null };
   }
+}
+
+function channelEmbedSrc(channelId) {
+  const params = new URLSearchParams({
+    autoplay: "1",
+    mute: "1",
+    playsinline: "1",
+    rel: "0",
+    modestbranding: "1",
+    enablejsapi: "1",
+    origin: window.location.origin,
+  });
+  return `https://www.youtube.com/embed/live_stream?channel=${encodeURIComponent(channelId)}&${params}`;
 }
 
 async function initLiveCamera() {
@@ -54,30 +60,44 @@ async function initLiveCamera() {
   const channelId = mount.dataset.channelId;
   if (!channelId) return;
 
-  const { live, videoId, checked } = await fetchLiveStatus();
-  let src;
-  let shouldAutoplay = false;
+  const { videoId } = await fetchLiveStatus();
+  const title = mount.dataset.title || "Live stream";
 
-  if (videoId) {
-    src = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${embedQuery(true)}`;
-    shouldAutoplay = true;
-  } else if (checked && !live) {
-    src = `https://www.youtube.com/embed/live_stream?channel=${encodeURIComponent(channelId)}&${embedQuery(false)}`;
-    shouldAutoplay = false;
-  } else {
-    src = `https://www.youtube.com/embed/live_stream?channel=${encodeURIComponent(channelId)}&${embedQuery(true)}`;
-    shouldAutoplay = true;
+  try {
+    const YT = await loadYouTubeIframeApi();
+    mount.replaceChildren();
+
+    if (videoId) {
+      const holder = document.createElement("div");
+      holder.id = "live-camera-player";
+      holder.style.width = "100%";
+      holder.style.height = "100%";
+      mount.appendChild(holder);
+
+      new YT.Player(holder, {
+        videoId,
+        width: "100%",
+        height: "100%",
+        playerVars: playerVars(),
+        events: {
+          onReady: (event) => {
+            event.target.playVideo();
+          },
+        },
+      });
+      return;
+    }
+  } catch (_) {
+    // fall through to iframe embed
   }
 
   const iframe = document.createElement("iframe");
   iframe.id = "live-camera-player";
-  iframe.src = src;
-  iframe.title = mount.dataset.title || "Live stream";
+  iframe.src = channelEmbedSrc(channelId);
+  iframe.title = title;
   iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
   iframe.allowFullscreen = true;
   mount.replaceChildren(iframe);
-
-  if (!shouldAutoplay) return;
 
   try {
     const YT = await loadYouTubeIframeApi();
@@ -89,7 +109,7 @@ async function initLiveCamera() {
       },
     });
   } catch (_) {
-    // autoplay query params still apply if the API fails to load
+    // autoplay query params on iframe src still apply
   }
 }
 
