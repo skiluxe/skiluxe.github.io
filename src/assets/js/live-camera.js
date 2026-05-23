@@ -79,25 +79,14 @@ async function initLiveCamera() {
 
   if (!shouldAutoplay) return;
 
-  const unmuteBtn = document.querySelector(".live-camera__unmute");
-  if (unmuteBtn) {
-    unmuteBtn.textContent = mount.dataset.unmute || "Unmute";
-    unmuteBtn.hidden = false;
-  }
-
   try {
     const YT = await loadYouTubeIframeApi();
-    const player = new YT.Player(iframe, {
+    new YT.Player(iframe, {
       events: {
         onReady: (event) => {
           event.target.playVideo();
         },
       },
-    });
-    unmuteBtn?.addEventListener("click", () => {
-      player.unMute();
-      player.setVolume(100);
-      unmuteBtn.hidden = true;
     });
   } catch (_) {
     // autoplay query params still apply if the API fails to load
