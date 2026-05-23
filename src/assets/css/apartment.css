@@ -69,7 +69,6 @@
 .apartment__main { display: flex; flex-direction: column; gap: clamp(40px, 6vw, 72px); }
 
 .prose { max-width: 65ch; }
-.amenities {}
 .amenities__grid {
   list-style: none;
   padding: 0;
@@ -209,7 +208,8 @@
 .picker-month__cell.is-empty { visibility: hidden; }
 .picker-month__cell.is-past { color: rgba(91, 107, 128, 0.35); }
 .picker-month__cell.is-pending:not(:disabled) { background: rgba(168, 114, 72, 0.12); color: var(--bronze-2); }
-.picker-month__cell.is-blocked:not(:disabled) { background: var(--navy); color: var(--snow); opacity: 0.55; }
+.picker-month__cell.is-blocked { color: rgba(91, 107, 128, 0.55); }
+.picker-month__cell.is-blocked:not(:disabled) { background: transparent; opacity: 1; }
 .picker-month__cell.is-selectable {
   cursor: pointer;
 }
