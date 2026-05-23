@@ -49,8 +49,8 @@
       error_generic: {{ i18n[lang].booking.error_generic | dump | safe }},
       rate_limited: {{ i18n[lang].booking.rate_limited | default(i18n[lang].booking.error_generic) | dump | safe }},
       unavailable: {{ i18n[lang].booking.error_unavailable | dump | safe }},
-      calendar_scope: {{ i18n[lang].availability.scope_note | dump | safe }},
-      beyond_calendar: {{ i18n[lang].availability.beyond_calendar | dump | safe }}
+      calendar_pick_checkin: {{ i18n[lang].booking.calendar_pick_checkin | dump | safe }},
+      calendar_pick_checkout: {{ i18n[lang].booking.calendar_pick_checkout | dump | safe }}
     };
   </script>
 </head>

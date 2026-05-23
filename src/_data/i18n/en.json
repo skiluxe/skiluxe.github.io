@@ -128,6 +128,10 @@
     "rate_limited": "Too many booking attempts. Please wait 10 minutes and try again.",
     "error_unavailable": "Sorry — those dates are no longer available. Please pick different dates.",
     "select_dates": "Select dates to see the price",
+    "calendar_prev": "Previous month",
+    "calendar_next": "Next month",
+    "calendar_pick_checkin": "Select check-in",
+    "calendar_pick_checkout": "Select check-out",
     "min_stay": "Minimum 1 night.",
     "max_guests": "Maximum {n} guests for this apartment."
   },

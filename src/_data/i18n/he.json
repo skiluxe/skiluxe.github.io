@@ -126,6 +126,10 @@
     "error_generic": "משהו השתבש. נסו שוב או כתבו לנו ב‑WhatsApp.",
     "error_unavailable": "מצטערים — התאריכים האלה כבר תפוסים. אנא בחרו תאריכים אחרים.",
     "select_dates": "בחרו תאריכים כדי לראות את המחיר",
+    "calendar_prev": "חודש קודם",
+    "calendar_next": "חודש הבא",
+    "calendar_pick_checkin": "בחרו צ׳ק-אין",
+    "calendar_pick_checkout": "בחרו צ׳ק-אאוט",
     "min_stay": "מינימום לילה אחד.",
     "max_guests": "מקסימום {n} אורחים לדירה הזו."
   },

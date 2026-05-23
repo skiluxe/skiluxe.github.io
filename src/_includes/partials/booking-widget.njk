@@ -8,16 +8,33 @@
   </header>
 
   <form class="booking__form" novalidate>
-    <div class="booking__row">
-      <label>
-        <span>{{ i18n[lang].booking.checkin }}</span>
-        <input type="date" name="checkin" required>
-      </label>
-      <label>
-        <span>{{ i18n[lang].booking.checkout }}</span>
-        <input type="date" name="checkout" required>
-      </label>
+    <div class="booking__row booking__dates">
+      <div class="booking__date-box">
+        <span class="booking__date-label">{{ i18n[lang].booking.checkin }}</span>
+        <strong class="booking__date-value" data-display="checkin">—</strong>
+      </div>
+      <div class="booking__date-box">
+        <span class="booking__date-label">{{ i18n[lang].booking.checkout }}</span>
+        <strong class="booking__date-value" data-display="checkout">—</strong>
+      </div>
     </div>
+    <input type="hidden" name="checkin" required>
+    <input type="hidden" name="checkout" required>
+
+    <div class="booking__picker" hidden>
+      <div class="booking__picker-nav">
+        <button type="button" class="booking__picker-prev" aria-label="{{ i18n[lang].booking.calendar_prev }}">‹</button>
+        <button type="button" class="booking__picker-next" aria-label="{{ i18n[lang].booking.calendar_next }}">›</button>
+      </div>
+      <p class="booking__picker-hint">{{ i18n[lang].booking.calendar_pick_checkin }}</p>
+      <div class="booking__picker-months"></div>
+      <div class="booking__picker-legend">
+        <span><i class="legend legend--available"></i>{{ i18n[lang].availability.available }}</span>
+        <span><i class="legend legend--pending"></i>{{ i18n[lang].availability.pending }}</span>
+        <span><i class="legend legend--blocked"></i>{{ i18n[lang].availability.blocked }}</span>
+      </div>
+    </div>
+
     <label class="booking__guests">
       <span>{{ i18n[lang].booking.guests }}</span>
       <select name="guests" required>

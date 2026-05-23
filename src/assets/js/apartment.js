@@ -1,6 +1,6 @@
-// Apartment detail page: gallery, availability calendar, booking widget.
+// Apartment detail page: gallery, interactive booking calendar, booking widget.
 const CFG = window.SKILUXE_CONFIG || { lang: "en", apiBase: "" };
-const STR = window.SKILUXE_I18N || {}; // optional: loaded by server
+const STR = window.SKILUXE_I18N || {};
 
 const apiBase = CFG.apiBase || "";
 
@@ -42,6 +42,30 @@ function diffDays(a, b) {
   return Math.round((b - a) / (1000 * 60 * 60 * 24));
 }
 
+function startOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function startOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function addMonths(date, count) {
+  return new Date(date.getFullYear(), date.getMonth() + count, 1);
+}
+
+function endOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+}
+
+function parseYmd(str) {
+  return new Date(str + "T00:00:00");
+}
+
+function todayStart() {
+  return startOfDay(new Date());
+}
+
 // ---------- Gallery ----------
 function initGallery() {
   const gallery = document.querySelector(".gallery");
@@ -57,7 +81,7 @@ function initGallery() {
   });
 }
 
-// ---------- Availability calendar ----------
+// ---------- Availability ----------
 const availabilityCache = { slug: null, from: null, to: null, dates: {} };
 
 async function fetchAvailability(slug, from, to) {
@@ -99,8 +123,8 @@ async function ensureAvailability(slug, fromDate, toDate) {
   let fetchFrom = fromDate;
   let fetchTo = toDate;
   if (availabilityCache.slug === slug && availabilityCache.from && availabilityCache.to) {
-    const cacheFrom = new Date(availabilityCache.from + "T00:00:00");
-    const cacheTo = new Date(availabilityCache.to + "T00:00:00");
+    const cacheFrom = parseYmd(availabilityCache.from);
+    const cacheTo = parseYmd(availabilityCache.to);
     if (cacheFrom < fetchFrom) fetchFrom = cacheFrom;
     if (cacheTo > fetchTo) fetchTo = cacheTo;
   }
@@ -120,8 +144,8 @@ async function ensureAvailability(slug, fromDate, toDate) {
 }
 
 function isRangeUnavailable(checkin, checkout, statusByDate) {
-  let cur = new Date(checkin + "T00:00:00");
-  const stop = new Date(checkout + "T00:00:00");
+  let cur = parseYmd(checkin);
+  const stop = parseYmd(checkout);
   while (cur < stop) {
     const st = statusByDate[ymd(cur)];
     if (st === "blocked" || st === "pending") return true;
@@ -130,102 +154,38 @@ function isRangeUnavailable(checkin, checkout, statusByDate) {
   return false;
 }
 
-// Ski season grid: November–April (6 months, 3×2 layout).
-const SKI_SEASON_MONTHS = [10, 11, 0, 1, 2, 3]; // Nov–Apr
-
-function getSkiSeasonStartYear(today = new Date()) {
-  const y = today.getFullYear();
-  const m = today.getMonth();
-  if (m >= 4 && m <= 9) return y; // May–Oct → upcoming season
-  if (m >= 10) return y; // Nov–Dec → season starts this year
-  return y - 1; // Jan–Apr → season started last November
+function isBlockedNight(key, statusByDate) {
+  const st = statusByDate[key];
+  return st === "blocked" || st === "pending";
 }
 
-function getSkiSeasonMonths(today = new Date()) {
-  const startYear = getSkiSeasonStartYear(today);
-  return SKI_SEASON_MONTHS.map((month) => {
-    const year = month >= 10 ? startYear : startYear + 1;
-    return new Date(year, month, 1);
-  });
-}
-
-function calendarViewStart(today = new Date()) {
-  return getSkiSeasonMonths(today)[0];
-}
-
-function calendarViewEnd(today = new Date()) {
-  const apr = getSkiSeasonMonths(today)[5];
-  return new Date(apr.getFullYear(), apr.getMonth() + 1, 0);
-}
-
-function isBeyondCalendarView(checkin, checkout) {
-  const start = calendarViewStart();
-  const end = calendarViewEnd();
-  const ci = new Date(checkin + "T00:00:00");
-  const co = new Date(checkout + "T00:00:00");
-  return ci < start || co > end;
-}
-
-function renderScopeNote(section) {
-  const note = section?.querySelector(".availability__scope");
-  if (!note) return;
-  const months = getSkiSeasonMonths();
-  const fromDt = months[0];
-  const toDt = calendarViewEnd();
-  const tpl = STR.calendar_scope || "Ski season: {from} – {to}.";
-  note.textContent = tpl
-    .replace("{from}", fmtDate(fromDt, { month: "long", year: "numeric" }))
-    .replace("{to}", fmtDate(toDt, { month: "long", year: "numeric" }));
-  note.hidden = false;
-}
-
-function monthGrid(year, month, statusByDate, today) {
+function monthGridCells(year, month, statusByDate, today) {
   const first = new Date(year, month, 1);
-  const days = new Date(year, month + 1, 0).getDate();
-  const leading = (first.getDay() + 6) % 7; // Monday-first
+  const days = endOfMonth(first).getDate();
+  const leading = (first.getDay() + 6) % 7;
   const cells = [];
   for (let i = 0; i < leading; i++) cells.push({ empty: true });
   for (let d = 1; d <= days; d++) {
     const date = new Date(year, month, d);
     const key = ymd(date);
-    const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    cells.push({ day: d, key, status: statusByDate[key] || "available", past: isPast });
+    cells.push({
+      day: d,
+      key,
+      status: statusByDate[key] || "available",
+      past: date < today,
+    });
   }
   return cells;
 }
 
-function renderCalendar(grid, statusByDate) {
-  const today = new Date();
-  const seasonMonths = getSkiSeasonMonths(today);
-  const dows = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-  let html = "";
-  for (const dt of seasonMonths) {
-    const cells = monthGrid(dt.getFullYear(), dt.getMonth(), statusByDate, today);
-    const title = new Intl.DateTimeFormat(CFG.lang, { month: "long", year: "numeric" }).format(dt);
-    html += `<div class="cal"><h3 class="cal__title">${title}</h3><div class="cal__grid">`;
-    for (const d of dows) html += `<div class="cal__dow">${d}</div>`;
-    for (const c of cells) {
-      if (c.empty) { html += `<div class="cal__cell is-empty"></div>`; continue; }
-      const cls = ["cal__cell"];
-      if (c.past) cls.push("is-past");
-      if (c.status === "pending") cls.push("is-pending");
-      if (c.status === "blocked") cls.push("is-blocked");
-      html += `<div class="${cls.join(" ")}" data-date="${c.key}">${c.day}</div>`;
-    }
-    html += `</div></div>`;
-  }
-  grid.innerHTML = html;
+function pickerMonthCount() {
+  return window.matchMedia("(min-width: 640px)").matches ? 2 : 1;
 }
 
-async function initCalendar() {
-  const grid = document.querySelector(".availability__grid");
-  if (!grid) return;
-  const slug = grid.dataset.slug;
-  const from = calendarViewStart();
-  const to = calendarViewEnd();
-  const statusByDate = await ensureAvailability(slug, from, to);
-  renderCalendar(grid, statusByDate);
-  renderScopeNote(grid.closest(".availability"));
+function weekdayLabels() {
+  const base = new Date(2024, 0, 1); // Monday
+  const fmt = new Intl.DateTimeFormat(CFG.lang, { weekday: "short" });
+  return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(base.getTime() + i * 86400000)));
 }
 
 // ---------- Booking widget ----------
@@ -237,6 +197,13 @@ function initBooking() {
   const form = widget.querySelector(".booking__form");
   const checkin = form.querySelector('[name="checkin"]');
   const checkout = form.querySelector('[name="checkout"]');
+  const checkinDisplay = form.querySelector('[data-display="checkin"]');
+  const checkoutDisplay = form.querySelector('[data-display="checkout"]');
+  const picker = form.querySelector(".booking__picker");
+  const pickerMonths = form.querySelector(".booking__picker-months");
+  const pickerHint = form.querySelector(".booking__picker-hint");
+  const pickerPrev = form.querySelector(".booking__picker-prev");
+  const pickerNext = form.querySelector(".booking__picker-next");
   const guests = form.querySelector('[name="guests"]');
   const infants = form.querySelector('[name="infants"]');
   const couponCode = form.querySelector('[name="coupon_code"]');
@@ -258,17 +225,13 @@ function initBooking() {
   const subtitle = widget.querySelector(".booking__subtitle");
   const guestSection = widget.querySelector(".booking__guest");
 
-  // Default checkin = today + 7, checkout = today + 10
-  const today = new Date();
+  const today = todayStart();
   const defIn = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
-  checkin.min = ymd(today);
-  checkout.min = ymd(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1));
+  let viewStart = startOfMonth(defIn);
+  let awaitingCheckout = false;
 
-  function syncCheckoutFromCheckin() {
-    if (!checkin.value) return;
-    const ciD = new Date(checkin.value + "T00:00:00");
-    checkout.min = ymd(new Date(ciD.getFullYear(), ciD.getMonth(), ciD.getDate() + 1));
-    checkout.value = ymd(new Date(ciD.getFullYear(), ciD.getMonth(), ciD.getDate() + 3));
+  function normalizedCoupon() {
+    return (couponCode?.value || "").trim().toUpperCase();
   }
 
   function showError(msg) {
@@ -282,12 +245,35 @@ function initBooking() {
     hint.hidden = false;
   }
 
+  function updateDateDisplays() {
+    if (checkinDisplay) {
+      checkinDisplay.textContent = checkin.value
+        ? fmtDate(parseYmd(checkin.value), { day: "numeric", month: "short" })
+        : "—";
+    }
+    if (checkoutDisplay) {
+      checkoutDisplay.textContent = checkout.value
+        ? fmtDate(parseYmd(checkout.value), { day: "numeric", month: "short" })
+        : "—";
+    }
+    if (pickerHint) {
+      pickerHint.textContent = awaitingCheckout
+        ? (STR.calendar_pick_checkout || "Select check-out")
+        : (STR.calendar_pick_checkin || "Select check-in");
+    }
+  }
+
+  function setDates(ci, co, { refresh = true } = {}) {
+    checkin.value = ci || "";
+    checkout.value = co || "";
+    awaitingCheckout = !!ci && !co;
+    updateDateDisplays();
+    if (refresh) refreshQuote();
+    renderPicker();
+  }
+
   let quoteTimer;
   let datesUnavailable = false;
-
-  function normalizedCoupon() {
-    return (couponCode?.value || "").trim().toUpperCase();
-  }
 
   function setSubmitEnabled(enabled) {
     submitButtons.forEach((btn) => { btn.disabled = !enabled; });
@@ -308,17 +294,34 @@ function initBooking() {
     if (payIdle) payIdle.hidden = false;
     if (payBusy) payBusy.hidden = true;
     if (holdIdle) holdIdle.hidden = false;
-    if (holdBusy) holdBusy.hidden = true;
+    if (holdBusy) holdBusy.hidden = false;
   }
 
   async function refreshQuote() {
     showError("");
     datesUnavailable = false;
-    const ci = checkin.value, co = checkout.value;
-    if (!ci || !co) { quoteBox.hidden = true; showHint(STR.select_dates); setSubmitEnabled(false); return; }
-    const ciD = new Date(ci + "T00:00:00"), coD = new Date(co + "T00:00:00");
-    if (coD <= ciD) { quoteBox.hidden = true; showHint(STR.min_stay); setSubmitEnabled(false); return; }
-    if (diffDays(ciD, coD) < 1) { quoteBox.hidden = true; showHint(STR.min_stay); setSubmitEnabled(false); return; }
+    const ci = checkin.value;
+    const co = checkout.value;
+    if (!ci || !co) {
+      quoteBox.hidden = true;
+      showHint(STR.select_dates);
+      setSubmitEnabled(false);
+      return;
+    }
+    const ciD = parseYmd(ci);
+    const coD = parseYmd(co);
+    if (coD <= ciD) {
+      quoteBox.hidden = true;
+      showHint(STR.min_stay);
+      setSubmitEnabled(false);
+      return;
+    }
+    if (diffDays(ciD, coD) < 1) {
+      quoteBox.hidden = true;
+      showHint(STR.min_stay);
+      setSubmitEnabled(false);
+      return;
+    }
 
     if (apiBase) {
       const statusByDate = await ensureAvailability(slug, ciD, coD);
@@ -330,15 +333,10 @@ function initBooking() {
         setSubmitEnabled(false);
         return;
       }
-      if (isBeyondCalendarView(ci, co)) {
-        showHint(STR.beyond_calendar || "Your dates are outside the ski season calendar; availability was checked.");
-      } else {
-        showHint("");
-      }
+      showHint("");
     }
 
     if (!apiBase) {
-      // Offline / static-only: show a rough estimate from base rate
       const nights = diffDays(ciD, coD);
       const base = parseInt(widget.dataset.base, 10);
       const currency = widget.dataset.currency || "GEL";
@@ -349,6 +347,7 @@ function initBooking() {
       setSubmitEnabled(true);
       return;
     }
+
     clearTimeout(quoteTimer);
     quoteTimer = setTimeout(async () => {
       try {
@@ -381,7 +380,7 @@ function initBooking() {
         } else {
           setSubmitEnabled(true);
         }
-      } catch (e) {
+      } catch (_) {
         quoteBox.hidden = true;
         showHint("");
         setSubmitEnabled(false);
@@ -429,15 +428,121 @@ function initBooking() {
     showHint("");
   }
 
-  checkin.addEventListener("change", () => {
-    syncCheckoutFromCheckin();
+  function inSelectedRange(key) {
+    if (!checkin.value) return false;
+    if (!checkout.value) return key === checkin.value;
+    const start = parseYmd(checkin.value);
+    const end = parseYmd(checkout.value);
+    const d = parseYmd(key);
+    return d >= start && d <= end;
+  }
+
+  function isRangeStart(key) {
+    return checkin.value === key;
+  }
+
+  function isRangeEnd(key) {
+    return checkout.value === key;
+  }
+
+  function canSelectAsCheckin(key, statusByDate) {
+    if (parseYmd(key) < today) return false;
+    return !isBlockedNight(key, statusByDate);
+  }
+
+  async function renderPicker() {
+    if (!pickerMonths) return;
+    const count = pickerMonthCount();
+    const fetchEnd = endOfMonth(addMonths(viewStart, count - 1));
+    const statusByDate = await ensureAvailability(slug, viewStart, fetchEnd);
+    const dows = weekdayLabels();
+    let html = "";
+
+    for (let i = 0; i < count; i++) {
+      const monthDate = addMonths(viewStart, i);
+      const cells = monthGridCells(monthDate.getFullYear(), monthDate.getMonth(), statusByDate, today);
+      const title = new Intl.DateTimeFormat(CFG.lang, { month: "long", year: "numeric" }).format(monthDate);
+      html += `<div class="picker-month"><h3 class="picker-month__title">${title}</h3><div class="picker-month__grid">`;
+      for (const d of dows) html += `<div class="picker-month__dow">${d}</div>`;
+      for (const c of cells) {
+        if (c.empty) {
+          html += `<div class="picker-month__cell is-empty" aria-hidden="true"></div>`;
+          continue;
+        }
+        const cls = ["picker-month__cell"];
+        if (c.past) cls.push("is-past");
+        if (c.status === "pending") cls.push("is-pending");
+        if (c.status === "blocked") cls.push("is-blocked");
+        if (!c.past && !isBlockedNight(c.key, statusByDate)) cls.push("is-selectable");
+        if (inSelectedRange(c.key)) cls.push("is-in-range");
+        if (isRangeStart(c.key)) cls.push("is-range-start");
+        if (isRangeEnd(c.key)) cls.push("is-range-end");
+        const disabled = c.past || (!awaitingCheckout && isBlockedNight(c.key, statusByDate));
+        html += `<button type="button" class="${cls.join(" ")}" data-date="${c.key}"${disabled ? " disabled" : ""} aria-label="${c.key}">${c.day}</button>`;
+      }
+      html += `</div></div>`;
+    }
+
+    pickerMonths.innerHTML = html;
+    pickerMonths.querySelectorAll(".picker-month__cell[data-date]").forEach((btn) => {
+      btn.addEventListener("click", () => onPickDate(btn.dataset.date));
+    });
+    if (picker) picker.hidden = false;
+  }
+
+  function onPickDate(key) {
+    const statusByDate = availabilityCache.dates;
+    if (parseYmd(key) < today) return;
+
+    if (!awaitingCheckout || !checkin.value) {
+      if (!canSelectAsCheckin(key, statusByDate)) return;
+      setDates(key, "", { refresh: false });
+      updateDateDisplays();
+      renderPicker();
+      return;
+    }
+
+    const ciD = parseYmd(checkin.value);
+    const coD = parseYmd(key);
+    if (coD <= ciD) {
+      setDates(key, "", { refresh: false });
+      updateDateDisplays();
+      renderPicker();
+      return;
+    }
+
+    if (isRangeUnavailable(checkin.value, key, statusByDate)) {
+      showError(STR.unavailable || "Dates no longer available. Please pick different dates.");
+      setDates(key, "", { refresh: false });
+      updateDateDisplays();
+      renderPicker();
+      return;
+    }
+
+    showError("");
+    checkout.value = key;
+    awaitingCheckout = false;
+    updateDateDisplays();
+    renderPicker();
     refreshQuote();
+  }
+
+  pickerPrev?.addEventListener("click", () => {
+    const minView = startOfMonth(today);
+    const next = addMonths(viewStart, -1);
+    if (next < minView) return;
+    viewStart = next;
+    renderPicker();
   });
-  checkin.addEventListener("input", () => {
-    syncCheckoutFromCheckin();
-    refreshQuote();
+
+  pickerNext?.addEventListener("click", () => {
+    viewStart = addMonths(viewStart, 1);
+    renderPicker();
   });
-  [checkout, guests, infants, nonRefundable, couponCode].forEach((el) => {
+
+  window.matchMedia("(min-width: 640px)").addEventListener("change", () => renderPicker());
+
+  [guests, infants, nonRefundable, couponCode].forEach((el) => {
     if (!el) return;
     el.addEventListener("change", refreshQuote);
     el.addEventListener("input", refreshQuote);
@@ -445,11 +550,6 @@ function initBooking() {
   couponCode?.addEventListener("blur", () => {
     if (couponCode.value) couponCode.value = couponCode.value.trim().toUpperCase();
   });
-
-  // Set defaults & initial quote
-  checkin.value = ymd(defIn);
-  syncCheckoutFromCheckin();
-  refreshQuote();
 
   async function submitBooking(paymentMode) {
     showError("");
@@ -537,7 +637,7 @@ function initBooking() {
       guestSection.hidden = true;
       quoteBox.hidden = true;
       hint.hidden = true;
-    } catch (err) {
+    } catch (_) {
       showError(STR.error_generic || "Something went wrong. Please try again or message us on WhatsApp.");
     } finally {
       resetSubmitting();
@@ -547,12 +647,17 @@ function initBooking() {
 
   submitPay?.addEventListener("click", () => submitBooking("pay"));
   submitHold?.addEventListener("click", () => submitBooking("hold"));
+  form.addEventListener("submit", (e) => e.preventDefault());
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-  });
+  // Defaults: check-in +7 days, check-out +10 days
+  const defOut = new Date(defIn.getFullYear(), defIn.getMonth(), defIn.getDate() + 3);
+  checkin.value = ymd(defIn);
+  checkout.value = ymd(defOut);
+  awaitingCheckout = false;
+  updateDateDisplays();
+  renderPicker();
+  refreshQuote();
 }
 
 initGallery();
-initCalendar();
 initBooking();
