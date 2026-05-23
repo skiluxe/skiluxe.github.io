@@ -16,6 +16,13 @@ function fmtMoney(cents, currency) {
   }
 }
 
+function formatPercent(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return String(value ?? "");
+  const rounded = Math.round(n * 1000) / 1000;
+  return String(rounded).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+}
+
 function fmtDate(date, opts) {
   try {
     return new Intl.DateTimeFormat(CFG.lang, opts || { day: "numeric", month: "short", year: "numeric" }).format(date);
@@ -386,7 +393,7 @@ function initBooking() {
     if (a.kind === "single_night") return STR.single_night_surcharge || a.label;
     if (a.kind === "occupancy_single") return STR.single_occupancy_discount || a.label;
     if (a.kind === "occupancy_extra") {
-      return (STR.extra_guests_surcharge || a.label).replace("{percent}", String(a.percent ?? ""));
+      return (STR.extra_guests_surcharge || a.label).replace("{percent}", formatPercent(a.percent));
     }
     if (a.kind === "weekly") return STR.weekly_discount || a.label;
     if (a.kind === "non_refundable") return STR.non_refundable_discount || a.label;
@@ -394,7 +401,7 @@ function initBooking() {
       const code = (a.label || "").replace(/^Coupon\s+/i, "") || "";
       return (STR.coupon_discount || "Coupon {code} ({percent}%)")
         .replace("{code}", code)
-        .replace("{percent}", String(a.percent ?? ""));
+        .replace("{percent}", formatPercent(a.percent));
     }
     return a.label || a.kind;
   }

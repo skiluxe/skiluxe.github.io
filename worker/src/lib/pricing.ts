@@ -47,7 +47,7 @@ function occupancyAdjustment(
   }
   if (payingGuests > BASE_OCCUPANCY) {
     const extra = payingGuests - BASE_OCCUPANCY;
-    const percent = extra * EXTRA_GUEST_SURCHARGE * 100;
+    const percent = extra * 10; // 10% per guest above base occupancy (2)
     return {
       kind: "occupancy_extra",
       label: `Extra guests (+${percent}%)`,
